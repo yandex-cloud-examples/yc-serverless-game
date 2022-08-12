@@ -55,7 +55,7 @@ export class MainScene extends phaser.Scene {
         this.grid = new Grid(this, AssetKeys.Ground);
         this.player = new Player(this, AssetKeys.Player, 0, 0);
 
-        new GridMoveManager(this.grid, this.player);
+        const gridManager = new GridMoveManager(this.grid, this.player);
 
         this.cameras.main.startFollow(this.player);
 

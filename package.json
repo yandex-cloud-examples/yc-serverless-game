@@ -37,6 +37,7 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "bind-decorator": "^1.0.11",
     "phaser": "^3.55.2"
   }
 }

@@ -1,5 +1,5 @@
 export interface IGlobalConfig {
     worldGridSize: [number, number];
-    groundBlockSize: number;
+    gridCellSize: number;
     playerSize: number;
 }

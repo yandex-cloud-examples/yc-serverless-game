@@ -6,7 +6,7 @@ import './styles/index.pcss';
 
 GlobalConfigProvider.init({
     worldGridSize: [10, 10],
-    groundBlockSize: 120,
+    gridCellSize: 120,
     playerSize: 110,
 });
 

@@ -18,10 +18,18 @@ export class Player extends phaser.Physics.Arcade.Image {
         this.setCollideWorldBounds(true);
     }
 
-    moveToGrid(gridX: number, gridY: number) {
+    getGridPos(): [number, number] {
+        return GridCoords.getGridPosFromCoords(this.x, this.y);
+    }
+
+    moveToGridCell(gridX: number, gridY: number) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
-        this.setX(coords[0]);
-        this.setY(coords[1]);
+        this.scene.tweens.add({
+            targets: this,
+            x: coords[0],
+            y: coords[1],
+            duration: 300,
+        });
     }
 }
