@@ -1,0 +1,23 @@
+service: yandex-cloud-nodejs
+frameworkVersion: "3"
+
+provider:
+  name: yandex-cloud
+  runtime: nodejs16
+  httpApi:
+    payload: '1.0'
+
+
+plugins:
+  - "@yandex-cloud/serverless-plugin"
+
+package:
+  patterns:
+    - '!**'
+    - dist/server/*.js
+
+functions:
+  get-state:
+    handler: dist/server/get-state.handler
+    memorySize: 128
+    timeout: 5

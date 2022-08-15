@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { Configuration } from 'webpack';
+import { Configuration, EnvironmentPlugin } from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as env from '../../src/common/utils/env';
@@ -54,6 +54,10 @@ const config: Configuration = {
         new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve('src/client/assets/index.html.ejs'),
+        }),
+        new EnvironmentPlugin({
+            APP_ENV: 'development',
+            NODE_ENV: env.isProd ? 'production' : 'development',
         }),
     ],
 };
