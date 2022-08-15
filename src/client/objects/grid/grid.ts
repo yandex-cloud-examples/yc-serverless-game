@@ -23,11 +23,11 @@ export class Grid {
             }
 
             for (let gridY = 0; gridY < this.gridSize[1]; gridY++) {
-                const ground = new GridCell(scene, groundAssetKey, gridX, gridY);
+                const cell = new GridCell(scene, groundAssetKey, gridX, gridY);
 
-                ground.setInteractive();
+                cell.setInteractive();
 
-                yMap.set(gridY, ground);
+                yMap.set(gridY, cell);
             }
         }
 
