@@ -15,9 +15,30 @@ package:
   patterns:
     - '!**'
     - dist/server/*.js
+    - dist/server/certs/*
 
 functions:
   get-state:
     handler: dist/server/get-state.handler
     memorySize: 128
     timeout: 5
+    account: functions-sa
+    environment:
+      YDB_ENDPOINT: grpcs://ydb.serverless.yandexcloud.net:2135
+      YDB_DB: /ru-central1/b1g7usbinne7lipkpvc1/etnaq654r3kocbpcc094
+
+  login:
+    handler: dist/server/login.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    environment:
+      YDB_ENDPOINT: grpcs://ydb.serverless.yandexcloud.net:2135
+      YDB_DB: /ru-central1/b1g7usbinne7lipkpvc1/etnaq654r3kocbpcc094
+
+
+resources:
+  functions-sa:
+    type: yc::ServiceAccount
+    roles:
+      - editor

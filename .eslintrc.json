@@ -51,6 +51,7 @@
       "devDependencies": true
     }],
     "import/no-cycle": "off",
-    "unicorn/no-static-only-class": "off"
+    "unicorn/no-static-only-class": "off",
+    "arrow-body-style": ["error", "always"]
   }
 }
