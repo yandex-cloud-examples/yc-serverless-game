@@ -34,8 +34,8 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
     if (users.length === 0) {
         const id = uuid.v4();
         const color = Math.round(0xFF_FF_FF * Math.random()).toString(16);
-        const gridX = Math.round(Math.random() * 10);
-        const gridY = Math.round(Math.random() * 10);
+        const gridX = Math.ceil(Math.random() * 10);
+        const gridY = Math.ceil(Math.random() * 10);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
         const avatar = authParameters.photo_url || DEFAULT_PHOTO_URL;
         const user = new User({
