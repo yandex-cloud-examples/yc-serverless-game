@@ -9,18 +9,24 @@
     "build:server": "webpack --config config/webpack/server.ts",
     "build": "run-p build:client build:server",
     "deploy:serverless": "serverless deploy",
+    "deploy:static": "ts-node scripts/upload-to-s3.ts",
+    "deploy": "run-p deploy:serverless deploy:static",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --config config/webpack/client.ts"
+    "start": "webpack serve --config config/webpack/client.ts --allowed-hosts all"
   },
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@aws-sdk/client-s3": "^3.150.0",
+    "@types/cookie": "^0.5.1",
+    "@types/lodash": "^4.14.184",
+    "@types/mime-types": "^2.1.1",
     "@types/node": "^18.6.5",
     "@types/uuid": "^8.3.4",
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
-    "@yandex-cloud/function-types": "^1.0.0",
-    "@yandex-cloud/serverless-plugin": "^1.1.0",
+    "@yandex-cloud/function-types": "^2.0.0",
+    "@yandex-cloud/serverless-plugin": "^1.2.0",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
     "eslint": "^8.21.0",
@@ -48,6 +54,10 @@
   },
   "dependencies": {
     "bind-decorator": "^1.0.11",
+    "cookie": "^0.5.0",
+    "fast-glob": "^3.2.11",
+    "lodash": "^4.17.21",
+    "mime-types": "^2.1.35",
     "phaser": "^3.55.2",
     "uuid": "^8.3.2",
     "ydb-sdk": "^3.4.0"
