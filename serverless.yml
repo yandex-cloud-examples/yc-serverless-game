@@ -4,8 +4,6 @@ frameworkVersion: "3"
 provider:
   name: yandex-cloud
   runtime: nodejs16
-  httpApi:
-    payload: '1.0'
 
 
 plugins:
@@ -24,8 +22,8 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
-      YDB_ENDPOINT: grpcs://ydb.serverless.yandexcloud.net:2135
-      YDB_DB: /ru-central1/b1g7usbinne7lipkpvc1/etnaq654r3kocbpcc094
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
   login:
     handler: dist/server/login.handler
@@ -33,8 +31,20 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
-      YDB_ENDPOINT: grpcs://ydb.serverless.yandexcloud.net:2135
-      YDB_DB: /ru-central1/b1g7usbinne7lipkpvc1/etnaq654r3kocbpcc094
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+      TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
+
+
+  auth:
+    handler: dist/server/auth.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    environment:
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+      TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
 
 
 resources:
@@ -42,3 +52,5 @@ resources:
     type: yc::ServiceAccount
     roles:
       - editor
+  serverless-game-files:
+    type: yc::ObjectStorageBucket

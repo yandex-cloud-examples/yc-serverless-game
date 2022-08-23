@@ -9,6 +9,7 @@ const config: Configuration = {
     entry: {
         'get-state': path.resolve('src/server/functions/get-state/index.ts'),
         login: path.resolve('src/server/functions/login/index.ts'),
+        auth: path.resolve('src/server/functions/auth/index.ts'),
     },
     resolve: {
         extensions: ['.ts', '.js'],

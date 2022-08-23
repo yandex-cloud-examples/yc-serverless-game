@@ -1,12 +1,11 @@
-import { User } from '../../models/user';
+import { FunctionHandler } from '@yandex-cloud/function-types';
+import { User } from '../../db/entity/user';
 import { withDb } from '../../db/with-db';
+import { functionResponse } from '../../utils/function-response';
 
-export const handler = withDb(async (dbSess, event, context) => {
+export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
     const { resultSets } = await dbSess.executeQuery('SELECT * FROM Users');
-    const users = User.fromResultSet<User>(resultSets[0]);
+    const users = User.fromResultSet(resultSets[0]);
 
-    return {
-        statusCode: 200,
-        body: JSON.stringify(users),
-    };
+    return functionResponse(users);
 });

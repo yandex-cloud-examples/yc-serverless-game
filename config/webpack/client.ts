@@ -55,6 +55,11 @@ const config: Configuration = {
         new HtmlWebpackPlugin({
             template: path.resolve('src/client/assets/index.html.ejs'),
         }),
+        new HtmlWebpackPlugin({
+            filename: 'login.html',
+            template: path.resolve('src/client/assets/login.html.ejs'),
+            inject: false,
+        }),
         new EnvironmentPlugin({
             APP_ENV: 'development',
             NODE_ENV: env.isProd ? 'production' : 'development',
