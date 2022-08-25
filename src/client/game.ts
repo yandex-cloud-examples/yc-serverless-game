@@ -13,10 +13,12 @@ export class ServerlessGame {
     }
 
     async init() {
+        const gameConfig = await this.apiClient.getConfig();
         const serverState = await this.apiClient.getState();
+
         const gameState = new GameState(serverState);
 
-        ConfigProvider.init(serverState.gameConfig);
+        ConfigProvider.init(gameConfig);
 
         const mainScene = new MainScene(gameState, this.apiClient);
 

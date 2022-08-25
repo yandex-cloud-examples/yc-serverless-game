@@ -25,6 +25,15 @@ functions:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
+  get-config:
+    handler: dist/server/get-config.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    environment:
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+
   login:
     handler: dist/server/login.handler
     memorySize: 128

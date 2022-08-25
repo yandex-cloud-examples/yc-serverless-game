@@ -2,7 +2,7 @@ import axios, {
     AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse,
 } from 'axios';
 import axiosRetry from 'axios-retry';
-import { ServerState } from '../../common/types';
+import { GameConfig, ServerState } from '../../common/types';
 
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_BASE_URL = '/api/';
@@ -40,6 +40,15 @@ export class ApiClient {
         const response = await this.request<ServerState>({
             method: 'GET',
             url: '/get-state',
+        });
+
+        return response.data;
+    }
+
+    async getConfig() {
+        const response = await this.request<GameConfig>({
+            method: 'GET',
+            url: '/get-config',
         });
 
         return response.data;

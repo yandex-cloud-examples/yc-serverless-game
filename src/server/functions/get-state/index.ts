@@ -4,7 +4,6 @@ import { withDb } from '../../db/with-db';
 import { functionResponse } from '../../utils/function-response';
 import { PlayerState, ServerState } from '../../../common/types';
 import { GridCell } from '../../db/entity/grid-cell';
-import { getGameConfig } from '../../utils/get-game-config';
 import { defaultLogger } from '../../../common/logger';
 
 const userToPlayerState = (user: User): PlayerState => {
@@ -22,7 +21,6 @@ const userToPlayerState = (user: User): PlayerState => {
 
 export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
     const meId: string = (event.requestContext.authorizer as Record<string, string>).userId;
-    const gameConfig = await getGameConfig(dbSess);
 
     const { resultSets: usersResultSets } = await dbSess.executeQuery('SELECT * FROM Users');
     const users = User.fromResultSet(usersResultSets[0]);
@@ -35,7 +33,6 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
     const serverState: ServerState = {
         grid: {},
         players: [],
-        gameConfig,
         me: userToPlayerState(me),
     };
 
