@@ -1,30 +1,18 @@
-import * as phaser from 'phaser';
-import { MainScene } from './scene/main';
-import { GlobalConfigProvider } from './utils/global-config-provider';
+import { configure } from 'mobx';
+import { defaultLogger } from '../common/logger';
+import { ServerlessGame } from './game';
 
 import './styles/index.pcss';
 
-GlobalConfigProvider.init({
-    worldGridSize: [10, 10],
-    gridCellSize: 120,
-    playerSize: 110,
+configure({
+    enforceActions: 'always',
+    computedRequiresReaction: true,
+    reactionRequiresObservable: true,
+    observableRequiresReaction: true,
 });
 
-const game = new phaser.Game({
-    type: phaser.AUTO,
-    width: '100%',
-    height: '100%',
-    backgroundColor: '#555555',
-    scene: MainScene,
-    input: {
-        keyboard: false,
-        mouse: true,
-        touch: true,
-    },
-    fps: {
-        target: 24,
-    },
-    physics: {
-        default: 'arcade',
-    },
-});
+const serverlessGame = new ServerlessGame();
+
+serverlessGame.init()
+    .then(() => defaultLogger.log('Serverless game successfully initialized'))
+    .catch((error) => defaultLogger.log(`Serverless game failed to initialize: ${error}`));

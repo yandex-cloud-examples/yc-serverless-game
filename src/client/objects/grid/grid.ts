@@ -1,6 +1,6 @@
 import * as phaser from 'phaser';
 import { AssetKeys } from '../../assets';
-import { GlobalConfigProvider } from '../../utils/global-config-provider';
+import { ConfigProvider } from '../../game-config/config-provider';
 import { GridCell } from './grid-cell';
 
 type AbstractCallback = (...args: any[]) => void;
@@ -11,7 +11,7 @@ export class Grid {
     private readonly eventListeners: Record<string, AbstractCallback[]> = {};
 
     constructor(scene: phaser.Scene, groundAssetKey: AssetKeys) {
-        this.gridSize = GlobalConfigProvider.getConfig().worldGridSize;
+        this.gridSize = ConfigProvider.getConfig().worldGridSize;
 
         for (let gridX = 0; gridX < this.gridSize[0]; gridX++) {
             let yMap = this.grid.get(gridX);

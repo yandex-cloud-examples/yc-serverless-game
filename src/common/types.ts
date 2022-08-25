@@ -1,4 +1,4 @@
-export interface IGlobalConfig {
+export interface GameConfig {
     worldGridSize: [number, number];
     gridCellSize: number;
     playerSize: number;
@@ -14,6 +14,7 @@ export const enum UserState {
 }
 
 export interface PlayerState {
+    id: string;
     name: string;
     avatar: string;
     color: string;
@@ -25,6 +26,7 @@ export interface PlayerState {
 
 export interface ServerState {
     grid: Record<number, Record<number, GridCellState>>;
-    me: PlayerState,
-    enemies: PlayerState[],
+    me: PlayerState;
+    players: PlayerState[];
+    gameConfig: GameConfig;
 }

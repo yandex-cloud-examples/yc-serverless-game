@@ -1,7 +1,7 @@
-import { GlobalConfigProvider } from '../../utils/global-config-provider';
+import { ConfigProvider } from '../../game-config/config-provider';
 
 export class GridCoords {
-    private static configProvider = GlobalConfigProvider;
+    private static configProvider = ConfigProvider;
 
     static get gridCellSize() {
         return this.configProvider.getConfig().gridCellSize;
@@ -26,5 +26,9 @@ export class GridCoords {
         const boundY = gridY * this.gridCellSize;
 
         return [boundX, boundY];
+    }
+
+    static equals(a: [number, number], b: [number, number]): boolean {
+        return a[0] === b[0] && a[1] === b[1];
     }
 }

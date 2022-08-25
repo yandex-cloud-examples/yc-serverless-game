@@ -12,7 +12,7 @@
     "deploy:static": "ts-node scripts/upload-to-s3.ts",
     "deploy": "run-p deploy:serverless deploy:static",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "webpack serve --config config/webpack/client.ts --allowed-hosts all"
+    "start": "webpack serve --config config/webpack/client.ts"
   },
   "author": "",
   "license": "ISC",
@@ -33,6 +33,7 @@
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
     "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-mobx": "^0.0.9",
     "eslint-plugin-prefer-arrow-functions": "^3.1.4",
     "eslint-plugin-unicorn": "^43.0.2",
     "file-loader": "^6.2.0",
@@ -53,13 +54,17 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "axios": "^0.27.2",
+    "axios-retry": "^3.3.1",
     "bind-decorator": "^1.0.11",
     "cookie": "^0.5.0",
     "fast-glob": "^3.2.11",
     "lodash": "^4.17.21",
     "mime-types": "^2.1.35",
+    "mobx": "^6.6.1",
     "phaser": "^3.55.2",
     "uuid": "^8.3.2",
+    "visibilityjs": "^2.0.2",
     "ydb-sdk": "^3.4.0"
   }
 }

@@ -1,8 +1,8 @@
 import { bind } from 'bind-decorator';
 
-import { Grid } from './objects/grid/grid';
-import { Player } from './objects/player';
-import { GridCell } from './objects/grid/grid-cell';
+import { Grid } from '../objects/grid/grid';
+import { Player } from '../objects/player';
+import { GridCell } from '../objects/grid/grid-cell';
 
 export class GridMoveManager {
     private readonly player: Player;

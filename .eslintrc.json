@@ -15,7 +15,8 @@
     "@typescript-eslint",
     "unicorn",
     "import",
-    "prefer-arrow-functions"
+    "prefer-arrow-functions",
+    "mobx"
   ],
   "parserOptions": {
     "project": "tsconfig.json"
@@ -52,6 +53,7 @@
     }],
     "import/no-cycle": "off",
     "unicorn/no-static-only-class": "off",
-    "arrow-body-style": ["error", "always"]
+    "arrow-body-style": "off",
+    "unicorn/prefer-top-level-await": "off"
   }
 }

@@ -3,6 +3,11 @@ import { Configuration, EnvironmentPlugin } from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
 import * as env from '../../src/common/utils/env';
+import { getEnv } from '../../src/server/utils/get-env';
+
+import 'webpack-dev-server'; // for typings augmentation only
+
+const PROXY_TARGET_HOST = getEnv('DEV_SERVER_PROXY_TARGET', 'https://localhost');
 
 const config: Configuration = {
     mode: env.isProd ? 'production' : 'development',
@@ -65,6 +70,18 @@ const config: Configuration = {
             NODE_ENV: env.isProd ? 'production' : 'development',
         }),
     ],
+    devServer: {
+        port: 443,
+        https: true,
+        allowedHosts: 'all',
+        proxy: {
+            '/api': {
+                target: `${PROXY_TARGET_HOST}`,
+                secure: false,
+                changeOrigin: true,
+            },
+        },
+    },
 };
 
 export default config;

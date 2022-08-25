@@ -1,46 +1,30 @@
-import phaser from 'phaser';
+import phaser, { Game } from 'phaser';
 import { AssetFiles, AssetKeys } from '../assets';
 import { Grid } from '../objects/grid/grid';
-import { GlobalConfigProvider } from '../utils/global-config-provider';
+import { ConfigProvider } from '../game-config/config-provider';
 import { Player } from '../objects/player';
 import { GridCoords } from '../objects/grid/grid-coords';
-import { GridMoveManager } from '../grid-move-manager';
+import { GridMoveManager } from '../managers/grid-move-manager';
+import { GameState } from '../state/game-state';
+import { GameStatePoller } from '../state/game-state-poller';
+import { ApiClient } from '../api/client';
+import { PlayersStateManager } from '../managers/players-state-manager';
 
 export class MainScene extends phaser.Scene {
-    private _player: Player | undefined;
-    private get player() {
-        if (!this._player) {
-            throw new Error('Player is not created yet');
-        }
+    private gameState: GameState;
+    private apiClient: ApiClient;
 
-        return this._player;
-    }
-    private set player(player: Player) {
-        if (this._player) {
-            throw new Error('Player has been already set');
-        }
-
-        this._player = player;
-    }
-
-    private _grid: Grid | undefined;
-    private get grid() {
-        if (!this._grid) {
-            throw new Error('Grid is not created yet');
-        }
-
-        return this._grid;
-    }
-    private set grid(grid: Grid) {
-        if (this._grid) {
-            throw new Error('Grid has been already set');
-        }
-
-        this._grid = grid;
-    }
-
-    constructor() {
+    constructor(gameState: GameState, apiClient: ApiClient) {
         super('main');
+
+        this.gameState = gameState;
+        this.apiClient = apiClient;
+    }
+
+    private get worldSize() {
+        const { worldGridSize } = ConfigProvider.getConfig();
+
+        return GridCoords.getBoundsFromGridPos(worldGridSize[0], worldGridSize[1]);
     }
 
     preload() {
@@ -49,18 +33,18 @@ export class MainScene extends phaser.Scene {
     }
 
     create() {
-        const { worldGridSize } = GlobalConfigProvider.getConfig();
-        const worldSize = GridCoords.getBoundsFromGridPos(worldGridSize[0], worldGridSize[1]);
+        const grid = new Grid(this, AssetKeys.Ground);
+        const playersStateManager = new PlayersStateManager(this.gameState, this);
+        const me = playersStateManager.getMe();
+        const gridMoveManager = new GridMoveManager(grid, me);
 
-        this.grid = new Grid(this, AssetKeys.Ground);
-        this.player = new Player(this, AssetKeys.Player, 0, 0);
+        const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
 
-        const gridManager = new GridMoveManager(this.grid, this.player);
+        gameStatePoller.start();
 
-        this.cameras.main.startFollow(this.player);
-
-        this.physics.world.setBounds(0, 0, worldSize[0], worldSize[1]);
+        this.cameras.main.startFollow(me);
+        this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
     }
 
-    update(time: number, delta: number) {}
+    // update(time: number, delta: number) {}
 }

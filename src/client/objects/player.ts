@@ -1,11 +1,11 @@
 import * as phaser from 'phaser';
 import { AssetKeys } from '../assets';
-import { GlobalConfigProvider } from '../utils/global-config-provider';
+import { ConfigProvider } from '../game-config/config-provider';
 import { GridCoords } from './grid/grid-coords';
 
 export class Player extends phaser.Physics.Arcade.Image {
-    constructor(scene: phaser.Scene, assetKey: AssetKeys, gridX: number, gridY: number) {
-        const { playerSize } = GlobalConfigProvider.getConfig();
+    constructor(scene: phaser.Scene, assetKey: AssetKeys, colorHex: string, gridX = 0, gridY = 0) {
+        const { playerSize } = ConfigProvider.getConfig();
 
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
@@ -16,20 +16,26 @@ export class Player extends phaser.Physics.Arcade.Image {
 
         this.setDisplaySize(playerSize, playerSize);
         this.setCollideWorldBounds(true);
+        this.setTint(Number.parseInt(colorHex, 16));
     }
 
     getGridPos(): [number, number] {
         return GridCoords.getGridPosFromCoords(this.x, this.y);
     }
 
-    moveToGridCell(gridX: number, gridY: number) {
+    moveToGridCell(gridX: number, gridY: number, animate = true) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
-        this.scene.tweens.add({
-            targets: this,
-            x: coords[0],
-            y: coords[1],
-            duration: 300,
-        });
+        if (animate) {
+            this.scene.tweens.add({
+                targets: this,
+                x: coords[0],
+                y: coords[1],
+                duration: 300,
+            });
+        } else {
+            this.setX(coords[0]);
+            this.setY(coords[1]);
+        }
     }
 }

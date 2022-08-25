@@ -8,7 +8,8 @@
     "strict": true,
     "skipLibCheck": true,
     "experimentalDecorators": true,
-    "sourceMap": true
+    "sourceMap": true,
+    "useDefineForClassFields": true
   },
   "include": [
     "src",

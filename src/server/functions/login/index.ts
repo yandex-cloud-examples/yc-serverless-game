@@ -9,6 +9,7 @@ import { functionResponse } from '../../utils/function-response';
 import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
 import { UserState } from '../../../common/types';
+import { getGameConfig } from '../../utils/get-game-config';
 
 const DEFAULT_PHOTO_URL = '/static/images/default-avatar.png';
 
@@ -32,18 +33,14 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
     const users = User.fromResultSet(resultSets[0]);
 
     if (users.length === 0) {
-        const id = uuid.v4();
-        const color = Math.round(0xFF_FF_FF * Math.random()).toString(16);
-        const gridX = Math.ceil(Math.random() * 10);
-        const gridY = Math.ceil(Math.random() * 10);
+        const gameConfig = await getGameConfig(dbSess);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
-        const avatar = authParameters.photo_url || DEFAULT_PHOTO_URL;
         const user = new User({
-            id,
-            color,
-            gridX,
-            gridY,
-            tgAvatar: avatar,
+            id: uuid.v4(),
+            color: Math.round(0xFF_FF_FF * Math.random()).toString(16),
+            gridX: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
+            gridY: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
+            tgAvatar: authParameters.photo_url || DEFAULT_PHOTO_URL,
             lastActive: new Date(),
             state: UserState.DEFAULT,
             tgUsername: login,
