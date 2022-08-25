@@ -10,6 +10,14 @@ const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_REQUEST_TIMEOUT_MS = 2000;
 const DEFAULT_BASE_URL = '/api/';
 
+const isTimoutError = (error: AxiosError): boolean => {
+    return error.code === 'ECONNABORTED';
+};
+
+const isRetryable = (error: AxiosError): boolean => {
+    return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error) || isTimoutError(error);
+};
+
 export class ApiClient {
     private readonly axiosInstance: AxiosInstance;
     private readonly modificationMutex: Mutex;
@@ -27,7 +35,7 @@ export class ApiClient {
             retries: retryCount,
             retryDelay: axiosRetry.exponentialDelay,
             // intentionally retry non-idempotent
-            retryCondition: (error) => axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error),
+            retryCondition: isRetryable,
         });
     }
 
@@ -42,7 +50,7 @@ export class ApiClient {
                 return result;
             })
             .catch((error: AxiosError) => {
-                logger.error(`error request to ${config.url}`);
+                logger.debug(`error request to ${config.url}`);
 
                 if (error.response?.status && [401, 403].includes(error.response?.status)) {
                     window.location.replace('/login.html');
