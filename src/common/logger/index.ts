@@ -1,13 +1,7 @@
-export class Logger {
-    log(msg: unknown) {
-        // eslint-disable-next-line no-console
-        console.log(msg);
-    }
+import log from 'loglevel';
 
-    error(msg: unknown) {
-        // eslint-disable-next-line no-console
-        console.error(msg);
-    }
-}
+export const logger = log.getLogger('default');
 
-export const defaultLogger = new Logger();
+const level = (process.env.LOG_LEVEL || 'warn') as log.LogLevelDesc;
+
+logger.setLevel(level);

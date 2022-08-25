@@ -3,16 +3,16 @@ import { bind } from 'bind-decorator';
 import { Grid } from '../objects/grid/grid';
 import { Player } from '../objects/player';
 import { GridCell } from '../objects/grid/grid-cell';
+import { ApiClient } from '../api/client';
 
 export class GridMoveManager {
-    private readonly player: Player;
-    private readonly grid: Grid;
     private selectedCell: GridCell | null = null;
 
-    constructor(grid: Grid, player: Player) {
-        this.player = player;
-        this.grid = grid;
-
+    constructor(
+        private readonly grid: Grid,
+        private readonly player: Player,
+        private readonly apiClient: ApiClient,
+    ) {
         this.grid.onCellClick(this.onCellClick);
     }
 
@@ -23,6 +23,9 @@ export class GridMoveManager {
         const clickedCell = this.grid.getCell(gridPos[0], gridPos[1]);
 
         if (clickedCell === this.selectedCell) {
+            // do not wait for promise resolution intentionally
+            this.apiClient.moveTo(gridPos[0], gridPos[1]);
+
             this.player.moveToGridCell(gridPos[0], gridPos[1]);
 
             this.selectedCell.clearTint().clearAlpha();

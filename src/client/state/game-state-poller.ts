@@ -3,7 +3,7 @@ import { bind } from 'bind-decorator';
 
 import { ApiClient } from '../api/client';
 import { GameState } from './game-state';
-import { defaultLogger } from '../../common/logger';
+import { logger } from '../../common/logger';
 
 const DEFAULT_POLL_DELAY_MS = 700;
 const DEFAULT_ERRORS_COUNT_BEFORE_DELAY = 5;
@@ -36,10 +36,14 @@ export class GameStatePoller {
     }
 
     start() {
+        logger.debug('Start polling');
+
         this.state = PollingState.POLLING;
     }
 
     stop() {
+        logger.debug('Stop polling');
+
         this.state = PollingState.STOPPED;
     }
 
@@ -55,7 +59,7 @@ export class GameStatePoller {
                 break;
 
             default:
-                defaultLogger.error(`Unknown visibility state: ${state}`);
+                logger.error(`Unknown visibility state: ${state}`);
         }
     }
 
@@ -73,8 +77,9 @@ export class GameStatePoller {
                     // eslint-disable-next-line no-await-in-loop
                     const severState = await this.apiClient.getState();
 
-                    // in case polling was stopped while current request was in progress we don't want to update state
-                    if (this.state === PollingState.POLLING) {
+                    logger.debug('Got new state from server', severState);
+
+                    if (severState) {
                         this.gameState.update(severState);
                     }
                 } catch (error) {
@@ -97,6 +102,6 @@ export class GameStatePoller {
             this.pollingErrorsCount = 0;
         }
 
-        defaultLogger.error(`Error polling state: ${error}`);
+        logger.warn(`Error polling state: ${error}`);
     }
 }

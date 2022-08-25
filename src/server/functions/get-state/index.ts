@@ -4,7 +4,7 @@ import { withDb } from '../../db/with-db';
 import { functionResponse } from '../../utils/function-response';
 import { PlayerState, ServerState } from '../../../common/types';
 import { GridCell } from '../../db/entity/grid-cell';
-import { defaultLogger } from '../../../common/logger';
+import { logger } from '../../../common/logger';
 
 const userToPlayerState = (user: User): PlayerState => {
     return {
@@ -57,7 +57,7 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
                 ownerColor: owner.color,
             };
         } else {
-            defaultLogger.error(`Unable to find owner for cell ${cell.x}:${cell.y}`);
+            logger.error(`Unable to find owner for cell ${cell.x}:${cell.y}`);
         }
     }
 

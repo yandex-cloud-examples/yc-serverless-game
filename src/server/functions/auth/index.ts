@@ -4,7 +4,7 @@ import { withDb } from '../../db/with-db';
 import { AUTH_COOKIE_NAME } from '../../utils/constants';
 import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
-import { defaultLogger } from '../../../common/logger';
+import { logger } from '../../../common/logger';
 
 export const handler = withDb<AuthorizerHandler>(async (dbSess, event, context) => {
     const authResult: ReturnType<AuthorizerHandler> = {
@@ -38,7 +38,7 @@ export const handler = withDb<AuthorizerHandler>(async (dbSess, event, context) 
                 }
             }
         } catch (error) {
-            defaultLogger.error(`Error parsing auth cookie: ${error}`);
+            logger.error(`Error parsing auth cookie: ${error}`);
         }
     }
 

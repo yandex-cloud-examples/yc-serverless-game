@@ -16,6 +16,10 @@ export class ServerlessGame {
         const gameConfig = await this.apiClient.getConfig();
         const serverState = await this.apiClient.getState();
 
+        if (!serverState) {
+            throw new Error('Server state is possible stale at game init stage');
+        }
+
         const gameState = new GameState(serverState);
 
         ConfigProvider.init(gameConfig);

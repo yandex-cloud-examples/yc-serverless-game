@@ -36,7 +36,7 @@ export class MainScene extends phaser.Scene {
         const grid = new Grid(this, AssetKeys.Ground);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const me = playersStateManager.getMe();
-        const gridMoveManager = new GridMoveManager(grid, me);
+        const gridMoveManager = new GridMoveManager(grid, me, this.apiClient);
 
         const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
 
