@@ -33,7 +33,15 @@ export class PlayersStateManager {
         const meState = this.gameState.me;
 
         if (!this.me) {
-            this.me = new Player(this.scene, AssetKeys.Player, meState.color, meState.gridX, meState.gridY);
+            this.me = new Player(
+                this.scene,
+                AssetKeys.Player,
+                AssetKeys.DefaultAvatar,
+                meState.color,
+                meState.avatar,
+                meState.gridX,
+                meState.gridY,
+            );
         } else {
             const meCoords = this.me.getGridPos();
 
@@ -51,7 +59,15 @@ export class PlayersStateManager {
             let player: Player | undefined = this.enemies.get(state.id);
 
             if (!player) {
-                player = new Player(this.scene, AssetKeys.Player, state.color, state.gridX, state.gridY);
+                player = new Player(
+                    this.scene,
+                    AssetKeys.Player,
+                    AssetKeys.DefaultAvatar,
+                    state.color,
+                    state.avatar,
+                    state.gridX,
+                    state.gridY,
+                );
 
                 this.enemies.set(state.id, player);
             }

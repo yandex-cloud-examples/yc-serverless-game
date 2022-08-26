@@ -8,7 +8,7 @@ interface IUserData {
     id: string;
     lastActive: Date;
     tgUserId: string;
-    tgAvatar: string;
+    tgAvatar?: string;
     tgUsername: string;
     color: string;
     gridX: number;
@@ -27,8 +27,8 @@ export class User extends Entity {
     @declareType(Types.UTF8)
     public tgUserId: string;
 
-    @declareType(Types.UTF8)
-    public tgAvatar: string;
+    @declareType(Types.optional(Types.UTF8))
+    public tgAvatar?: string;
 
     @declareType(Types.UTF8)
     public tgUsername: string;

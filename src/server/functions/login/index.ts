@@ -11,7 +11,17 @@ import { User } from '../../db/entity/user';
 import { UserState } from '../../../common/types';
 import { getGameConfig } from '../../utils/get-game-config';
 
-const DEFAULT_PHOTO_URL = '/static/images/default-avatar.png';
+const TG_CDN_PREFIX = 'https://t.me/i/userpic';
+
+const transformAvatarUrl = (originalUrl: string): string | undefined => {
+    let result: string | undefined;
+
+    if (originalUrl.startsWith(TG_CDN_PREFIX)) {
+        result = originalUrl.replace(TG_CDN_PREFIX, '/proxy/tg-avatars');
+    }
+
+    return result;
+};
 
 export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
     const authParameters = pickAuthParameters(event.queryStringParameters);
@@ -35,12 +45,13 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
     if (users.length === 0) {
         const gameConfig = await getGameConfig(dbSess);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
+        const tgAvatar = authParameters.photo_url && transformAvatarUrl(authParameters.photo_url);
         const user = new User({
             id: uuid.v4(),
             color: Math.round(0xFF_FF_FF * Math.random()).toString(16),
             gridX: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
             gridY: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
-            tgAvatar: authParameters.photo_url || DEFAULT_PHOTO_URL,
+            tgAvatar,
             lastActive: new Date(),
             state: UserState.DEFAULT,
             tgUsername: login,
@@ -52,7 +63,7 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
             DECLARE $color AS UTF8;
             DECLARE $gridX AS UINT32;
             DECLARE $gridY AS UINT32;
-            DECLARE $tgAvatar AS UTF8;
+            DECLARE $tgAvatar AS UTF8?;
             DECLARE $lastActive AS TIMESTAMP;
             DECLARE $state AS UTF8;
             DECLARE $tgUsername AS UTF8;

@@ -30,6 +30,7 @@ export class MainScene extends phaser.Scene {
     preload() {
         this.load.image(AssetKeys.Ground, AssetFiles[AssetKeys.Ground]);
         this.load.image(AssetKeys.Player, AssetFiles[AssetKeys.Player]);
+        this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
     }
 
     create() {

@@ -81,6 +81,11 @@ const config: Configuration = {
                 secure: false,
                 changeOrigin: true,
             },
+            '/proxy': {
+                target: `${PROXY_TARGET_HOST}`,
+                secure: false,
+                changeOrigin: true,
+            },
         },
     },
 };

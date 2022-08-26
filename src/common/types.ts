@@ -16,7 +16,7 @@ export const enum UserState {
 export interface PlayerState {
     id: string;
     name: string;
-    avatar: string;
+    avatar?: string;
     color: string;
     scores: number;
     state: UserState;
