@@ -17,7 +17,7 @@ const config: Configuration = {
     },
     output: {
         path: path.resolve('dist/client'),
-        filename: 'index.js',
+        filename: 'static/index.js',
     },
     module: {
         rules: [
@@ -33,7 +33,7 @@ const config: Configuration = {
                 test: /\.(png|jpe?g|gif)$/i,
                 loader: 'file-loader',
                 options: {
-                    outputPath: 'images',
+                    outputPath: 'static/images',
                 },
             },
             {

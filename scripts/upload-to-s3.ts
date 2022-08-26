@@ -18,7 +18,7 @@ const uploadFile = (filePath: string) => {
         Bucket: 'serverless-game-files',
         Key: path.relative(FILES_BASE_DIR, filePath),
         Body: fs.createReadStream(filePath),
-        ContentType: 'text/html',
+        ContentType: contentType,
     });
 
     return client.send(command);

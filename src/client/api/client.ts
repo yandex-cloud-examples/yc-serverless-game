@@ -36,6 +36,7 @@ export class ApiClient {
             retryDelay: axiosRetry.exponentialDelay,
             // intentionally retry non-idempotent
             retryCondition: isRetryable,
+            shouldResetTimeout: true,
         });
     }
 
