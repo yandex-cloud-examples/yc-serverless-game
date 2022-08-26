@@ -1,10 +1,13 @@
 import { FunctionHandler } from '@yandex-cloud/function-types';
+import * as dateFns from 'date-fns';
 import { User } from '../../db/entity/user';
 import { withDb } from '../../db/with-db';
 import { functionResponse } from '../../utils/function-response';
 import { PlayerState, ServerState } from '../../../common/types';
 import { GridCell } from '../../db/entity/grid-cell';
 import { logger } from '../../../common/logger';
+import { MAX_INACTIVE_S } from '../../utils/constants';
+import { updateLastActive } from '../../utils/update-last-active';
 
 const userToPlayerState = (user: User): PlayerState => {
     return {
@@ -19,6 +22,15 @@ const userToPlayerState = (user: User): PlayerState => {
     };
 };
 
+// calls function with given chance, in other cases no-op
+const probablyCall = <F extends (...args: unknown[]) => R, R>(probability: number, fn: F): R | undefined => {
+    if (Math.random() <= probability) {
+        return fn();
+    }
+
+    return undefined;
+};
+
 export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
     const meId: string = (event.requestContext.authorizer as Record<string, string>).userId;
 
@@ -30,16 +42,20 @@ export const handler = withDb<FunctionHandler>(async (dbSess, event, context) =>
         throw new Error(`Unable to find me in DB: ${meId}`);
     }
 
+    await probablyCall(0.2, () => updateLastActive(me, dbSess));
+
+    const activeEnemies = users.filter((u) => {
+        return u.id !== meId && dateFns.differenceInSeconds(new Date(), u.lastActive) < MAX_INACTIVE_S;
+    });
+
     const serverState: ServerState = {
         grid: {},
         players: [],
         me: userToPlayerState(me),
     };
 
-    for (const user of users) {
-        if (user.id !== meId) {
-            serverState.players.push(userToPlayerState(user));
-        }
+    for (const enemy of activeEnemies) {
+        serverState.players.push(userToPlayerState(enemy));
     }
 
     const { resultSets: gridCellsResultSets } = await dbSess.executeQuery('SELECT * FROM GridCells');
