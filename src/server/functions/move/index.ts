@@ -1,4 +1,4 @@
-import { FunctionHandler } from '@yandex-cloud/function-types';
+import { Handler } from '@yandex-cloud/function-types';
 import { withDb } from '../../db/with-db';
 
 import { functionResponse } from '../../utils/function-response';
@@ -10,7 +10,7 @@ interface MoveRequest {
     gridY: number;
 }
 
-export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
+export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const moveRequest = safeJsonParse<Partial<MoveRequest>>(event.body);
 
     if (typeof moveRequest?.gridX !== 'number' || typeof moveRequest.gridY !== 'number') {

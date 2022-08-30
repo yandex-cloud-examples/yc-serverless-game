@@ -1,4 +1,4 @@
-import { AuthorizerHandler } from '@yandex-cloud/function-types';
+import { Handler } from '@yandex-cloud/function-types';
 import { TypedValues } from 'ydb-sdk';
 import { withDb } from '../../db/with-db';
 import { AUTH_COOKIE_NAME } from '../../utils/constants';
@@ -6,8 +6,8 @@ import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
 import { logger } from '../../../common/logger';
 
-export const handler = withDb<AuthorizerHandler>(async (dbSess, event, context) => {
-    const authResult: ReturnType<AuthorizerHandler> = {
+export const handler = withDb<Handler.ApiGatewayAuthorizer>(async (dbSess, event, context) => {
+    const authResult: ReturnType<Handler.ApiGatewayAuthorizer> = {
         isAuthorized: false,
         context: {},
     };

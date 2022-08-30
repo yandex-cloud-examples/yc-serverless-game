@@ -1,6 +1,5 @@
 import * as cookie from 'cookie';
-import * as _ from 'lodash';
-import { FunctionHandler } from '@yandex-cloud/function-types';
+import { Handler } from '@yandex-cloud/function-types';
 import * as uuid from 'uuid';
 import { TypedValues } from 'ydb-sdk';
 import { withDb } from '../../db/with-db';
@@ -23,7 +22,7 @@ const transformAvatarUrl = (originalUrl: string): string | undefined => {
     return result;
 };
 
-export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
+export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const authParameters = pickAuthParameters(event.queryStringParameters);
     const checkHash = await getAuthHash(authParameters);
 

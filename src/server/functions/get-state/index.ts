@@ -1,4 +1,4 @@
-import { FunctionHandler } from '@yandex-cloud/function-types';
+import { Handler } from '@yandex-cloud/function-types';
 import * as dateFns from 'date-fns';
 import { User } from '../../db/entity/user';
 import { withDb } from '../../db/with-db';
@@ -31,7 +31,7 @@ const probablyCall = <F extends (...args: unknown[]) => R, R>(probability: numbe
     return undefined;
 };
 
-export const handler = withDb<FunctionHandler>(async (dbSess, event, context) => {
+export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const meId: string = (event.requestContext.authorizer as Record<string, string>).userId;
 
     const { resultSets: usersResultSets } = await dbSess.executeQuery('SELECT * FROM Users');

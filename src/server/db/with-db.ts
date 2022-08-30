@@ -1,4 +1,4 @@
-import { FunctionHandler, AuthorizerHandler } from '@yandex-cloud/function-types';
+import { Handler as Handlers } from '@yandex-cloud/function-types';
 import { Driver, MetadataAuthService, Session } from 'ydb-sdk';
 import { getEnv } from '../utils/get-env';
 
@@ -8,11 +8,11 @@ const YDB_DB = getEnv('YDB_DB');
 
 let driver: Driver | undefined;
 
-type Handler = FunctionHandler | AuthorizerHandler;
+type Handler = Handlers.Http | Handlers.ApiGatewayAuthorizer;
 
 export type HandlerWithDb<H extends Handler> = H extends (...args: infer U) => infer R ? (dbSess: Session, ...args: U) => R : never;
 
-export const withDb = <H extends Handler = FunctionHandler>(handlerWithDb: HandlerWithDb<H>): H => {
+export const withDb = <H extends Handler = Handlers.Http>(handlerWithDb: HandlerWithDb<H>): H => {
     // TODO: hard to understand typing error here
     // @ts-ignore
     const fn: H = async (event: any, context: any) => {
