@@ -8,7 +8,7 @@ const YDB_DB = getEnv('YDB_DB');
 
 let driver: Driver | undefined;
 
-type Handler = Handlers.Http | Handlers.ApiGatewayAuthorizer;
+type Handler = Handlers.Http | Handlers.ApiGatewayAuthorizer | Handlers.MessageQueue;
 
 export type HandlerWithDb<H extends Handler> = H extends (...args: infer U) => infer R ? (dbSess: Session, ...args: U) => R : never;
 

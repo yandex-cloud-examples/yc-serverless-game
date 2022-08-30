@@ -5,7 +5,7 @@ import { ApiClient } from '../api/client';
 import { GameState } from './game-state';
 import { logger } from '../../common/logger';
 
-const DEFAULT_POLL_DELAY_MS = 700;
+const DEFAULT_POLL_DELAY_MS = 500;
 const DEFAULT_ERRORS_COUNT_BEFORE_DELAY = 5;
 const DEFAULT_POLL_DELAY_AFTER_ERRORS_MS = 4000;
 
@@ -82,6 +82,8 @@ export class GameStatePoller {
                     if (severState) {
                         this.gameState.update(severState);
                     }
+
+                    this.pollingErrorsCount = 0;
                 } catch (error) {
                     // eslint-disable-next-line no-await-in-loop
                     await this.handlePollError(error as Error);

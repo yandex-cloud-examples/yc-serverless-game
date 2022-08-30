@@ -6,6 +6,7 @@ import { Player } from '../objects/player';
 import { GameState } from '../state/game-state';
 import { AssetKeys } from '../assets';
 import { GridCoords } from '../objects/grid/grid-coords';
+import { UserState } from '../../common/types';
 
 export class PlayersStateManager {
     private me: Player | undefined;
@@ -37,6 +38,7 @@ export class PlayersStateManager {
                 this.scene,
                 AssetKeys.Player,
                 AssetKeys.DefaultAvatar,
+                AssetKeys.Progress,
                 meState.color,
                 meState.avatar,
                 meState.gridX,
@@ -49,6 +51,8 @@ export class PlayersStateManager {
                 this.me.moveToGridCell(meState.gridX, meState.gridY);
             }
         }
+
+        this.me.setCapturingState(meState.state === UserState.CAPTURING);
     }
 
     @bind
@@ -63,6 +67,7 @@ export class PlayersStateManager {
                     this.scene,
                     AssetKeys.Player,
                     AssetKeys.DefaultAvatar,
+                    AssetKeys.Progress,
                     state.color,
                     state.avatar,
                     state.gridX,
@@ -75,6 +80,8 @@ export class PlayersStateManager {
             if (!GridCoords.equals(player.getGridPos(), [state.gridX, state.gridY])) {
                 player.moveToGridCell(state.gridX, state.gridY);
             }
+
+            player.setCapturingState(state.state === UserState.CAPTURING);
         }
 
         // Remove players which are not in state anymore

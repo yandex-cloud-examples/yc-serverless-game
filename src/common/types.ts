@@ -29,3 +29,9 @@ export interface ServerState {
     me: PlayerState;
     players: PlayerState[];
 }
+
+export interface CapturingMessage {
+    playerId: string;
+    gridX: number;
+    gridY: number;
+}

@@ -4,6 +4,9 @@ import { ConfigProvider } from '../../game-config/config-provider';
 import { GridCoords } from './grid-coords';
 
 export class GridCell extends phaser.GameObjects.Image {
+    private color: string | undefined = undefined;
+    private isSelected = false;
+
     constructor(scene: phaser.Scene, assetKey: AssetKeys, gridX: number, gridY: number) {
         const { gridCellSize } = ConfigProvider.getConfig();
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
@@ -26,5 +29,32 @@ export class GridCell extends phaser.GameObjects.Image {
         const yDiff = Math.abs(thisCoords[1] - toCoords[1]);
 
         return (xDiff + yDiff === 1) || (xDiff === 1 && yDiff === 1);
+    }
+
+    setColor(color?: string) {
+        this.color = color;
+
+        if (!this.isSelected) {
+            this.resetState();
+        }
+    }
+
+    setSelected() {
+        this.isSelected = true;
+
+        this.setTint(0x00_FF_00);
+        this.setAlpha(0.5);
+    }
+
+    resetState() {
+        this.isSelected = false;
+
+        if (this.color) {
+            this.setTint(Number.parseInt(this.color, 16));
+            this.setAlpha(0.99);
+        } else {
+            this.clearTint();
+            this.clearAlpha();
+        }
     }
 }

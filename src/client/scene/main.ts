@@ -9,6 +9,7 @@ import { GameState } from '../state/game-state';
 import { GameStatePoller } from '../state/game-state-poller';
 import { ApiClient } from '../api/client';
 import { PlayersStateManager } from '../managers/players-state-manager';
+import { GridStateManager } from '../managers/grid-state-manager';
 
 export class MainScene extends phaser.Scene {
     private gameState: GameState;
@@ -31,11 +32,13 @@ export class MainScene extends phaser.Scene {
         this.load.image(AssetKeys.Ground, AssetFiles[AssetKeys.Ground]);
         this.load.image(AssetKeys.Player, AssetFiles[AssetKeys.Player]);
         this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
+        this.load.image(AssetKeys.Progress, AssetFiles[AssetKeys.Progress]);
     }
 
     create() {
         const grid = new Grid(this, AssetKeys.Ground);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
+        const gridStateManager = new GridStateManager(this.gameState, grid);
         const me = playersStateManager.getMe();
         const gridMoveManager = new GridMoveManager(grid, me, this.apiClient);
 

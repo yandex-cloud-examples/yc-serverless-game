@@ -90,8 +90,8 @@ export class ApiClient {
     }
 
     async moveTo(gridX: number, gridY: number) {
-        await this.modificationMutex.runExclusive(async () => {
-            await this.request({
+        await this.modificationMutex.runExclusive(() => {
+            return this.request({
                 method: 'POST',
                 url: '/move',
                 data: {

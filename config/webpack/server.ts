@@ -12,6 +12,7 @@ const config: Configuration = {
         auth: path.resolve('src/server/functions/auth/index.ts'),
         'get-config': path.resolve('src/server/functions/get-config/index.ts'),
         move: path.resolve('src/server/functions/move/index.ts'),
+        capture: path.resolve('src/server/functions/capture/index.ts'),
     },
     resolve: {
         extensions: ['.ts', '.js'],

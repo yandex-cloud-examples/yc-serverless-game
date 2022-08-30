@@ -54,6 +54,7 @@
     "import/no-cycle": "off",
     "unicorn/no-static-only-class": "off",
     "arrow-body-style": "off",
-    "unicorn/prefer-top-level-await": "off"
+    "unicorn/prefer-top-level-await": "off",
+    "no-await-in-loop": "off"
   }
 }

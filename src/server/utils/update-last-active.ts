@@ -1,10 +1,6 @@
-import { Session } from 'ydb-sdk';
-import { User } from '../db/entity/user';
+import { Session, TypedValues } from 'ydb-sdk';
 
-export const updateLastActive = async (user: User, dbSess: Session) => {
-    // eslint-disable-next-line no-param-reassign
-    user.lastActive = new Date();
-
+export const updateLastActive = async (userId: string, dbSess: Session) => {
     const updateLastActiveQuery = await dbSess.prepareQuery(`
         DECLARE $lastActive AS TIMESTAMP;
         DECLARE $id AS UTF8;
@@ -12,7 +8,7 @@ export const updateLastActive = async (user: User, dbSess: Session) => {
     `);
 
     await dbSess.executeQuery(updateLastActiveQuery, {
-        $id: user.getTypedValue('id'),
-        $lastActive: user.getTypedValue('lastActive'),
+        $id: TypedValues.utf8(userId),
+        $lastActive: TypedValues.timestamp(new Date()),
     });
 };

@@ -28,17 +28,15 @@ export class GridMoveManager {
 
             this.player.moveToGridCell(gridPos[0], gridPos[1]);
 
-            this.selectedCell.clearTint().clearAlpha();
+            this.selectedCell.resetState();
             this.selectedCell = null;
         } else if (playerGridCell.isAdjacent(clickedCell)) {
             if (this.selectedCell) {
-                this.selectedCell.clearTint().clearAlpha();
+                this.selectedCell.resetState();
             }
 
             this.selectedCell = clickedCell;
-
-            this.selectedCell.setTint(0x00_FF_00);
-            this.selectedCell.setAlpha(0.5);
+            this.selectedCell.setSelected();
         }
     }
 }

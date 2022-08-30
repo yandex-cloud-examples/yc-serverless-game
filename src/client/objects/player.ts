@@ -7,11 +7,14 @@ import { GridCoords } from './grid/grid-coords';
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyImage: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
     private readonly avatarImage: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    private readonly progressIcon: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    private readonly progressTween: phaser.Tweens.Tween;
 
     constructor(
         scene: phaser.Scene,
         bodyAssetKey: AssetKeys,
         defaultAvatarAssetKey: AssetKeys,
+        progressIconAssetKey: AssetKeys,
         colorHex: string,
         avatarUrl?: string,
         gridX = 0,
@@ -23,10 +26,12 @@ export class Player extends phaser.GameObjects.Container {
 
         super(scene, coords[0], coords[1]);
 
+        // Setup body image
         this.bodyImage = scene.physics.add.image(0, 0, bodyAssetKey)
             .setDisplaySize(playerSize, playerSize)
             .setTint(Number.parseInt(colorHex, 16));
 
+        // Setup avatar iamge
         const avatarSize = Math.round(playerSize / 3);
 
         this.avatarImage = scene.physics.add.image(0, 0, defaultAvatarAssetKey)
@@ -36,9 +41,25 @@ export class Player extends phaser.GameObjects.Container {
             this.loadAvatar(avatarUrl);
         }
 
+        // Setup progress icon
+        const progressIconsSize = Math.round(playerSize / 1.2);
+
+        this.progressIcon = scene.physics.add.image(0, 0, progressIconAssetKey)
+            .setDisplaySize(progressIconsSize, progressIconsSize)
+            .setVisible(false);
+
+        this.progressTween = scene.tweens.add({
+            targets: this.progressIcon,
+            duration: 1000,
+            angle: 360,
+            repeat: -1,
+        });
+
+        // Setup container
         this.add([
             this.bodyImage,
             this.avatarImage,
+            this.progressIcon,
         ]);
 
         scene.physics.systems.add.existing(this);
@@ -72,5 +93,9 @@ export class Player extends phaser.GameObjects.Container {
             this.setX(coords[0]);
             this.setY(coords[1]);
         }
+    }
+
+    setCapturingState(isCapturing: boolean) {
+        this.progressIcon.setVisible(isCapturing);
     }
 }

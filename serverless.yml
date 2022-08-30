@@ -22,6 +22,7 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
+      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -31,6 +32,7 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
+      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -40,6 +42,27 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
+      LOG_LEVEL: debug
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
+      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
+      YMQ_QUEUE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_queue_url}
+
+  capture:
+    handler: dist/server/capture.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    events:
+      - ymq:
+          account: triggers-sa
+          queueAccount: ymq-reader-sa
+          queue: capturing-queue
+          batch: 10
+          cutoff: 1
+    environment:
+      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -49,6 +72,7 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
+      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
@@ -60,6 +84,7 @@ functions:
     timeout: 5
     account: functions-sa
     environment:
+      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
@@ -70,5 +95,20 @@ resources:
     type: yc::ServiceAccount
     roles:
       - editor
+  triggers-sa:
+    type: yc::ServiceAccount
+    roles:
+      - serverless.functions.invoker
+  ymq-reader-sa:
+    type: yc::ServiceAccount
+    roles:
+      - editor
+  ymq-writer-sa:
+    type: yc::ServiceAccount
+    roles:
+      - editor
   serverless-game-files:
     type: yc::ObjectStorageBucket
+  capturing-queue:
+    type: yc::MessageQueue
+

@@ -17,7 +17,7 @@ const config: Configuration = {
     },
     output: {
         path: path.resolve('dist/client'),
-        filename: 'static/index.js',
+        filename: 'static/index-[hash].js',
     },
     module: {
         rules: [
