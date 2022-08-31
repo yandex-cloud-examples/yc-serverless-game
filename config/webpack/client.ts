@@ -17,7 +17,7 @@ const config: Configuration = {
     },
     output: {
         path: path.resolve('dist/client'),
-        filename: 'static/index-[hash].js',
+        filename: `static/index${env.isProd ? '-[hash]' : ''}.js`,
     },
     module: {
         rules: [
