@@ -13,6 +13,10 @@ interface MoveRequest {
     gridY: number;
 }
 
+// TODO: add restrictions
+// - same position
+// - adjacent
+// - out of bounds
 export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const moveRequest = safeJsonParse<Partial<MoveRequest>>(event.body);
 

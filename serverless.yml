@@ -38,7 +38,7 @@ functions:
 
   move:
     handler: dist/server/move.handler
-    memorySize: 128
+    memorySize: 512
     timeout: 5
     account: functions-sa
     environment:

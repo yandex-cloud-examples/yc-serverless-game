@@ -1,7 +1,6 @@
 import * as cookie from 'cookie';
 import { Handler } from '@yandex-cloud/function-types';
 import * as uuid from 'uuid';
-import { TypedValues } from 'ydb-sdk';
 import { withDb } from '../../db/with-db';
 import { AUTH_COOKIE_MAX_AGE, AUTH_COOKIE_NAME } from '../../utils/constants';
 import { functionResponse } from '../../utils/function-response';
@@ -22,6 +21,38 @@ const transformAvatarUrl = (originalUrl: string): string | undefined => {
     return result;
 };
 
+const getRandomColor = (existingColors: string[]): string => {
+    const MIN_COLOR = 0;
+    const MAX_COLOR = 0xFF_FF_FF;
+    const existingColorsNumbers = existingColors
+        .map((c) => Number.parseInt(c, 16))
+        .sort((a, b) => a - b);
+    const colorsSet = [
+        MIN_COLOR,
+        ...existingColorsNumbers,
+        MAX_COLOR,
+    ];
+
+    let startingColor = 0;
+    let distance = 0;
+
+    for (let i = 0; i < colorsSet.length - 1; i++) {
+        const newColor = colorsSet[i];
+        const newDistance = colorsSet[i + 1] - newColor;
+
+        if (newDistance > distance) {
+            distance = newDistance;
+            startingColor = newColor;
+        }
+    }
+
+    const randomBounds = distance / 100;
+    const randomNum = (Math.random() - 0.5) * randomBounds;
+    const colorNum = Math.abs(Math.round(startingColor + distance / 2 + randomNum));
+
+    return Math.min(colorNum, MAX_COLOR).toString(16);
+};
+
 export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const authParameters = pickAuthParameters(event.queryStringParameters);
     const checkHash = await getAuthHash(authParameters);
@@ -34,20 +65,21 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
 
     const getUsersQuery = await dbSess.prepareQuery(`
         DECLARE $tgUserId AS UTF8;
-        SELECT * FROM Users WHERE tg_user_id == $tgUserId;
+        SELECT * FROM Users;
     `);
-    const { resultSets } = await dbSess.executeQuery(getUsersQuery, {
-        $tgUserId: TypedValues.utf8(authParameters.id),
-    });
+    const { resultSets } = await dbSess.executeQuery(getUsersQuery);
     const users = User.fromResultSet(resultSets[0]);
+    const isRegistered = users.some((u) => u.tgUserId === authParameters.id);
 
-    if (users.length === 0) {
+    if (!isRegistered) {
         const gameConfig = await getGameConfig(dbSess);
+        const existingColors = users.map((u) => u.color);
+        const randomColor = getRandomColor(existingColors);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
         const tgAvatar = authParameters.photo_url && transformAvatarUrl(authParameters.photo_url);
         const user = new User({
             id: uuid.v4(),
-            color: Math.round(0xFF_FF_FF * Math.random()).toString(16),
+            color: randomColor,
             gridX: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
             gridY: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
             tgAvatar,
