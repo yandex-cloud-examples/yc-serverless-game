@@ -6,21 +6,31 @@ import { MAX_INACTIVE_S } from './constants';
 import { GridCell } from '../db/entity/grid-cell';
 import { logger } from '../../common/logger';
 
-const userToPlayerState = (user: User): PlayerState => {
+const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
+    const score = gridCells.reduce((value, cell) => {
+        if (cell.ownerId === user.id) {
+            return value + 10;
+        }
+
+        return value;
+    }, 0);
+
     return {
         id: user.id,
         name: user.tgUsername,
         avatar: user.tgAvatar,
         color: user.color,
-        scores: 0,
         state: user.state,
         gridX: user.gridX,
         gridY: user.gridY,
+        score,
     };
 };
 
 export const buildGameState = async (meId: string, dbSess: Session): Promise<ServerState> => {
     const users = await User.all(dbSess);
+    const gridCells = await GridCell.all(dbSess);
+
     const me = users.find((u) => u.id === meId);
 
     if (!me) {
@@ -34,14 +44,12 @@ export const buildGameState = async (meId: string, dbSess: Session): Promise<Ser
     const serverState: ServerState = {
         grid: {},
         players: [],
-        me: userToPlayerState(me),
+        me: userToPlayerState(me, gridCells),
     };
 
     for (const enemy of activeEnemies) {
-        serverState.players.push(userToPlayerState(enemy));
+        serverState.players.push(userToPlayerState(enemy, gridCells));
     }
-
-    const gridCells = await GridCell.all(dbSess);
 
     for (const cell of gridCells) {
         const owner = users.find((u) => { return u.id === cell.ownerId; });

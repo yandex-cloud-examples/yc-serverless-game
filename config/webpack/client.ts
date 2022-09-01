@@ -46,7 +46,8 @@ const config: Configuration = {
                         options: {
                             postcssOptions: {
                                 plugins: [
-                                    ['postcss-preset-env'],
+                                    'postcss-preset-env',
+                                    'postcss-nested',
                                 ],
                             },
                         },

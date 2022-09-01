@@ -82,6 +82,8 @@ export class Player extends phaser.GameObjects.Container {
     moveToGridCell(gridX: number, gridY: number, animate = true) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
+        this.setCapturingState(false);
+
         if (animate) {
             this.scene.tweens.add({
                 targets: this,

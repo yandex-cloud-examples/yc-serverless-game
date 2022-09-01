@@ -18,10 +18,10 @@ export interface PlayerState {
     name: string;
     avatar?: string;
     color: string;
-    scores: number;
     state: UserState;
     gridX: number;
     gridY: number;
+    score: number;
 }
 
 export interface ServerState {

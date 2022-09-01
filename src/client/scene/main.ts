@@ -10,6 +10,7 @@ import { GameStatePoller } from '../state/game-state-poller';
 import { ApiClient } from '../api/client';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
+import { ScoreManager } from '../managers/score-manager';
 
 export class MainScene extends phaser.Scene {
     private gameState: GameState;
@@ -41,13 +42,14 @@ export class MainScene extends phaser.Scene {
         const gridStateManager = new GridStateManager(this.gameState, grid);
         const me = playersStateManager.getMe();
         const gridMoveManager = new GridMoveManager(grid, me, this.apiClient);
+        const scoreManager = new ScoreManager(this.gameState, this, '#score');
+
+        this.cameras.main.startFollow(me);
+        this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
 
         const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
 
         gameStatePoller.start();
-
-        this.cameras.main.startFollow(me);
-        this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
     }
 
     // update(time: number, delta: number) {}
