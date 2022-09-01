@@ -20,15 +20,7 @@ const sqsClient = new SQS({
 });
 
 export const canBeCaptured = async (dbSess: Session, playerId: string, gridX: number, gridY: number): Promise<boolean> => {
-    const playerQuery = await dbSess.prepareQuery(`
-        DECLARE $id AS UTF8;
-        SELECT * FROM Users WHERE id = $id LIMIT 1;
-    `);
-    const { resultSets: usersResultSets } = await dbSess.executeQuery(playerQuery, {
-        $id: TypedValues.utf8(playerId),
-    });
-    const users = User.fromResultSet(usersResultSets[0]);
-    const player = users.find((u) => u.id === playerId);
+    const player = await User.findById(dbSess, playerId);
 
     if (!player) {
         throw new Error(`User ${playerId} not found in DB`);

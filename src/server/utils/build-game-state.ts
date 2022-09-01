@@ -20,8 +20,7 @@ const userToPlayerState = (user: User): PlayerState => {
 };
 
 export const buildGameState = async (meId: string, dbSess: Session): Promise<ServerState> => {
-    const { resultSets: usersResultSets } = await dbSess.executeQuery('SELECT * FROM Users');
-    const users = User.fromResultSet(usersResultSets[0]);
+    const users = await User.all(dbSess);
     const me = users.find((u) => u.id === meId);
 
     if (!me) {
@@ -42,8 +41,7 @@ export const buildGameState = async (meId: string, dbSess: Session): Promise<Ser
         serverState.players.push(userToPlayerState(enemy));
     }
 
-    const { resultSets: gridCellsResultSets } = await dbSess.executeQuery('SELECT * FROM GridCells');
-    const gridCells = GridCell.fromResultSet(gridCellsResultSets[0]);
+    const gridCells = await GridCell.all(dbSess);
 
     for (const cell of gridCells) {
         const owner = users.find((u) => { return u.id === cell.ownerId; });

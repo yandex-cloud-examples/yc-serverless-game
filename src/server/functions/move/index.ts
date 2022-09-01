@@ -28,8 +28,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
 
     const meId: string = event.requestContext.authorizer?.userId;
 
-    const { resultSets: usersResultSets } = await dbSess.executeQuery('SELECT * FROM Users');
-    const users = User.fromResultSet(usersResultSets[0]);
+    const users = await User.all(dbSess);
     const me = users.find((u) => u.id === meId);
 
     if (!me) {

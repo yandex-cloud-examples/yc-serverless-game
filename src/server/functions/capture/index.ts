@@ -7,11 +7,6 @@ import { User } from '../../db/entity/user';
 import { logger } from '../../../common/logger';
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
-    const playerQuery = await dbSess.prepareQuery(`
-        DECLARE $id AS UTF8;
-        
-        SELECT * FROM Users WHERE id = $id LIMIT 1;
-    `);
     const captureGridCellQuery = await dbSess.prepareQuery(`
         DECLARE $id AS UTF8;
         DECLARE $gridX as UINT32;
@@ -28,12 +23,7 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
 
     for (const message of event.messages) {
         const capturingMessage: CapturingMessage = JSON.parse(message.details.message.body);
-
-        const { resultSets } = await dbSess.executeQuery(playerQuery, {
-            $id: TypedValues.utf8(capturingMessage.playerId),
-        });
-        const users = User.fromResultSet(resultSets[0]);
-        const player = users.find((u) => u.id === capturingMessage.playerId);
+        const player = await User.findById(dbSess, capturingMessage.playerId);
 
         if (!player) {
             logger.error(`Unable to find player ${capturingMessage.playerId} in DB`);

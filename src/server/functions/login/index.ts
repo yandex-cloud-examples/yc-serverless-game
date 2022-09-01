@@ -63,12 +63,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         }, 400);
     }
 
-    const getUsersQuery = await dbSess.prepareQuery(`
-        DECLARE $tgUserId AS UTF8;
-        SELECT * FROM Users;
-    `);
-    const { resultSets } = await dbSess.executeQuery(getUsersQuery);
-    const users = User.fromResultSet(resultSets[0]);
+    const users = await User.all(dbSess);
     const isRegistered = users.some((u) => u.tgUserId === authParameters.id);
 
     if (!isRegistered) {

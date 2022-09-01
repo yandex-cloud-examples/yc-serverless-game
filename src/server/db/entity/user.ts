@@ -1,5 +1,5 @@
 import {
-    withTypeOptions, snakeToCamelCaseConversion, declareType, Types,
+    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues,
 } from 'ydb-sdk';
 import { Entity } from './entity';
 import { UserState } from '../../../common/types';
@@ -57,5 +57,25 @@ export class User extends Entity {
         this.gridX = data.gridX;
         this.gridY = data.gridY;
         this.state = data.state;
+    }
+
+    static async findById(dbSess: Session, id: string): Promise<User | undefined> {
+        const query = await dbSess.prepareQuery(`
+            DECLARE $id AS UTF8;
+            SELECT * FROM Users WHERE id = $id LIMIT 1;
+        `);
+        const { resultSets } = await dbSess.executeQuery(query, {
+            $id: TypedValues.utf8(id),
+        });
+        const users = this.fromResultSet(resultSets[0]);
+
+        return users[0];
+    }
+
+    static async all(dbSess: Session): Promise<User[]> {
+        const query = await dbSess.prepareQuery('SELECT * FROM Users');
+        const { resultSets } = await dbSess.executeQuery(query);
+
+        return this.fromResultSet(resultSets[0]);
     }
 }
