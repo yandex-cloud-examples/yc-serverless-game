@@ -22,6 +22,7 @@ export interface PlayerState {
     gridX: number;
     gridY: number;
     score: number;
+    imageType: number;
 }
 
 export interface ServerState {

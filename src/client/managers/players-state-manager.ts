@@ -36,10 +36,8 @@ export class PlayersStateManager {
         if (!this.me) {
             this.me = new Player(
                 this.scene,
-                AssetKeys.Player,
-                AssetKeys.DefaultAvatar,
-                AssetKeys.Progress,
                 meState.color,
+                meState.imageType,
                 meState.avatar,
                 meState.gridX,
                 meState.gridY,
@@ -65,10 +63,8 @@ export class PlayersStateManager {
             if (!player) {
                 player = new Player(
                     this.scene,
-                    AssetKeys.Player,
-                    AssetKeys.DefaultAvatar,
-                    AssetKeys.Progress,
                     state.color,
+                    state.imageType,
                     state.avatar,
                     state.gridX,
                     state.gridY,

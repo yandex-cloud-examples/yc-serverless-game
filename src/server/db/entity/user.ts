@@ -14,6 +14,7 @@ interface IUserData {
     gridX: number;
     gridY: number;
     state: UserState;
+    imageType: number;
 }
 
 @withTypeOptions({ namesConversion: snakeToCamelCaseConversion })
@@ -45,6 +46,9 @@ export class User extends Entity {
     @declareType(Types.UTF8)
     public state: UserState;
 
+    @declareType(Types.UINT8)
+    public imageType: number;
+
     constructor(data: IUserData) {
         super(data);
 
@@ -57,6 +61,7 @@ export class User extends Entity {
         this.gridX = data.gridX;
         this.gridY = data.gridY;
         this.state = data.state;
+        this.imageType = data.imageType;
     }
 
     static async findById(dbSess: Session, id: string): Promise<User | undefined> {

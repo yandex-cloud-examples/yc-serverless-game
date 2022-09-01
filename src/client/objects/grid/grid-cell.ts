@@ -51,7 +51,7 @@ export class GridCell extends phaser.GameObjects.Image {
 
         if (this.color) {
             this.setTint(Number.parseInt(this.color, 16));
-            this.setAlpha(0.99);
+            this.setAlpha(0.9);
         } else {
             this.clearTint();
             this.clearAlpha();

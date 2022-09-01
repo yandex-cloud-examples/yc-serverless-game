@@ -5,12 +5,19 @@ import { GridCell } from './grid-cell';
 
 type AbstractCallback = (...args: any[]) => void;
 
+const CELL_ASSETS = [
+    AssetKeys.Map1,
+    AssetKeys.Map2,
+    AssetKeys.Map3,
+    AssetKeys.Map4,
+];
+
 export class Grid {
     private readonly grid: Map<number, Map<number, GridCell>> = new Map();
     private readonly gridSize: [number, number];
     private readonly eventListeners: Record<string, AbstractCallback[]> = {};
 
-    constructor(scene: phaser.Scene, groundAssetKey: AssetKeys) {
+    constructor(scene: phaser.Scene) {
         this.gridSize = ConfigProvider.getConfig().worldGridSize;
 
         for (let gridX = 0; gridX < this.gridSize[0]; gridX++) {
@@ -23,7 +30,8 @@ export class Grid {
             }
 
             for (let gridY = 0; gridY < this.gridSize[1]; gridY++) {
-                const cell = new GridCell(scene, groundAssetKey, gridX, gridY);
+                const randomIndex = Math.floor(Math.random() * CELL_ASSETS.length);
+                const cell = new GridCell(scene, CELL_ASSETS[randomIndex], gridX, gridY);
 
                 cell.setInteractive();
 

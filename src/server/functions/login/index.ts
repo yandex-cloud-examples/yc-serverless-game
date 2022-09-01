@@ -2,7 +2,7 @@ import * as cookie from 'cookie';
 import { Handler } from '@yandex-cloud/function-types';
 import * as uuid from 'uuid';
 import { withDb } from '../../db/with-db';
-import { AUTH_COOKIE_MAX_AGE, AUTH_COOKIE_NAME } from '../../utils/constants';
+import { AUTH_COOKIE_MAX_AGE, AUTH_COOKIE_NAME, PLAYER_IMAGE_TYPES_NUM } from '../../utils/constants';
 import { functionResponse } from '../../utils/function-response';
 import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
@@ -72,6 +72,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         const randomColor = getRandomColor(existingColors);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
         const tgAvatar = authParameters.photo_url && transformAvatarUrl(authParameters.photo_url);
+        const imageType = Math.floor(Math.random() * PLAYER_IMAGE_TYPES_NUM + 1);
         const user = new User({
             id: uuid.v4(),
             color: randomColor,
@@ -82,6 +83,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             state: UserState.DEFAULT,
             tgUsername: login,
             tgUserId: authParameters.id,
+            imageType,
         });
 
         const createUserQuery = await dbSess.prepareQuery(`
@@ -94,6 +96,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             DECLARE $state AS UTF8;
             DECLARE $tgUsername AS UTF8;
             DECLARE $tgUserId AS UTF8;
+            DECLARE $imageType AS UINT8;
             INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username)
             VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername);
         `);
@@ -108,6 +111,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $state: user.getTypedValue('state'),
             $tgUsername: user.getTypedValue('tgUsername'),
             $tgUserId: user.getTypedValue('tgUserId'),
+            $imageType: user.getTypedValue('imageType'),
         });
     }
 

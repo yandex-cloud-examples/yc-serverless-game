@@ -23,6 +23,7 @@ const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
         state: user.state,
         gridX: user.gridX,
         gridY: user.gridY,
+        imageType: user.imageType,
         score,
     };
 };

@@ -12,6 +12,11 @@ import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
 import { ScoreManager } from '../managers/score-manager';
 
+const PLAYER_SPRITE_FRAME_CONFIG: phaser.Types.Loader.FileTypes.ImageFrameConfig = {
+    frameWidth: 81,
+    frameHeight: 81,
+};
+
 export class MainScene extends phaser.Scene {
     private gameState: GameState;
     private apiClient: ApiClient;
@@ -30,14 +35,25 @@ export class MainScene extends phaser.Scene {
     }
 
     preload() {
-        this.load.image(AssetKeys.Ground, AssetFiles[AssetKeys.Ground]);
-        this.load.image(AssetKeys.Player, AssetFiles[AssetKeys.Player]);
+        // map images
+        this.load.image(AssetKeys.Map1, AssetFiles[AssetKeys.Map1]);
+        this.load.image(AssetKeys.Map2, AssetFiles[AssetKeys.Map2]);
+        this.load.image(AssetKeys.Map3, AssetFiles[AssetKeys.Map3]);
+        this.load.image(AssetKeys.Map4, AssetFiles[AssetKeys.Map4]);
+
+        // player sprites
+        this.load.spritesheet(AssetKeys.Player1, AssetFiles[AssetKeys.Player1], PLAYER_SPRITE_FRAME_CONFIG);
+        this.load.spritesheet(AssetKeys.Player2, AssetFiles[AssetKeys.Player2], PLAYER_SPRITE_FRAME_CONFIG);
+        this.load.spritesheet(AssetKeys.Player3, AssetFiles[AssetKeys.Player3], PLAYER_SPRITE_FRAME_CONFIG);
+        this.load.spritesheet(AssetKeys.Player4, AssetFiles[AssetKeys.Player4], PLAYER_SPRITE_FRAME_CONFIG);
+
+        // rest
         this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
         this.load.image(AssetKeys.Progress, AssetFiles[AssetKeys.Progress]);
     }
 
     create() {
-        const grid = new Grid(this, AssetKeys.Ground);
+        const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const gridStateManager = new GridStateManager(this.gameState, grid);
         const me = playersStateManager.getMe();
