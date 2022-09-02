@@ -4,10 +4,11 @@ import mapType1Image from './assets/images/map/type1.svg';
 import mapType2Image from './assets/images/map/type2.svg';
 import mapType3Image from './assets/images/map/type3.svg';
 import mapType4Image from './assets/images/map/type4.svg';
-import playerType1Image from './assets/images/player/type1.svg';
-import playerType2Image from './assets/images/player/type2.svg';
-import playerType3Image from './assets/images/player/type3.svg';
-import playerType4Image from './assets/images/player/type4.svg';
+import playerType1Image from './assets/images/player/type1.png';
+import playerType2Image from './assets/images/player/type2.png';
+import playerType3Image from './assets/images/player/type3.png';
+import playerType4Image from './assets/images/player/type4.png';
+import backgroundImage from './assets/images/bg.png';
 
 export const enum AssetKeys {
     Player1 = 'player1',
@@ -20,6 +21,7 @@ export const enum AssetKeys {
     Map4 = 'map4',
     DefaultAvatar = 'default-avatar',
     Progress = 'progress',
+    Background = 'background',
 }
 
 export const AssetFiles: Record<AssetKeys, string> = {
@@ -33,4 +35,5 @@ export const AssetFiles: Record<AssetKeys, string> = {
     [AssetKeys.Map4]: mapType4Image,
     [AssetKeys.Progress]: progressImage,
     [AssetKeys.DefaultAvatar]: defaultAvatarImage,
+    [AssetKeys.Background]: backgroundImage,
 };

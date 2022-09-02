@@ -49,9 +49,18 @@ export class MainScene extends phaser.Scene {
         // rest
         this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
         this.load.image(AssetKeys.Progress, AssetFiles[AssetKeys.Progress]);
+        this.load.image(AssetKeys.Background, AssetFiles[AssetKeys.Background]);
     }
 
     create() {
+        this.add.tileSprite(
+            0,
+            0,
+            this.worldSize[0] * 10,
+            this.worldSize[1] * 10,
+            AssetKeys.Background,
+        );
+
         const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const gridStateManager = new GridStateManager(this.gameState, grid);

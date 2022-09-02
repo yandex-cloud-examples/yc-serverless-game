@@ -1,1 +1,1 @@
-export const PLAYER_MOVE_DURATION_MS = 500;
+export const PLAYER_MOVE_DURATION_MS = 600;

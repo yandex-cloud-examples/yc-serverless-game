@@ -31,7 +31,6 @@ export class ServerlessGame {
             width: '100%',
             height: '100%',
             parent: 'game',
-            backgroundColor: '#555555',
             scene: mainScene,
             input: {
                 keyboard: false,
