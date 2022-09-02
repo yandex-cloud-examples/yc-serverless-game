@@ -2,6 +2,7 @@ import {
     withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session,
 } from 'ydb-sdk';
 import { Entity } from './entity';
+import { executeQuery } from '../execute-query';
 
 interface IGridCellData {
     x: number;
@@ -29,8 +30,7 @@ export class GridCell extends Entity {
     }
 
     static async all(dbSess: Session): Promise<GridCell[]> {
-        const query = await dbSess.prepareQuery('SELECT * FROM GridCells');
-        const { resultSets } = await dbSess.executeQuery(query);
+        const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM GridCells');
 
         return this.fromResultSet(resultSets[0]);
     }

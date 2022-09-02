@@ -8,6 +8,7 @@ import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
 import { UserState } from '../../../common/types';
 import { getGameConfig } from '../../utils/get-game-config';
+import { executeQuery } from '../../db/execute-query';
 
 const TG_CDN_PREFIX = 'https://t.me/i/userpic';
 
@@ -86,7 +87,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             imageType,
         });
 
-        const createUserQuery = await dbSess.prepareQuery(`
+        const createUserQuery = `
             DECLARE $id AS UTF8;
             DECLARE $color AS UTF8;
             DECLARE $gridX AS UINT32;
@@ -99,9 +100,9 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             DECLARE $imageType AS UINT8;
             INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username)
             VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername);
-        `);
+        `;
 
-        await dbSess.executeQuery(createUserQuery, {
+        await executeQuery(dbSess, createUserQuery, {
             $id: user.getTypedValue('id'),
             $color: user.getTypedValue('color'),
             $gridX: user.getTypedValue('gridX'),

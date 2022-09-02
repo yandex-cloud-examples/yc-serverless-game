@@ -5,6 +5,7 @@ import { User } from '../../db/entity/user';
 import { GridCell } from '../../db/entity/grid-cell';
 import { CapturingMessage, UserState } from '../../../common/types';
 import { getEnv } from '../../utils/get-env';
+import { executeQuery } from '../../db/execute-query';
 
 const YMQ_WRITER_ACCESS_KEY_ID = getEnv('YMQ_WRITER_ACCESS_KEY_ID');
 const YMQ_WRITER_SECRET_ACCESS_KEY = getEnv('YMQ_WRITER_SECRET_ACCESS_KEY');
@@ -26,12 +27,12 @@ export const canBeCaptured = async (dbSess: Session, playerId: string, gridX: nu
         throw new Error(`User ${playerId} not found in DB`);
     }
 
-    const cellQuery = await dbSess.prepareQuery(`
+    const cellQuery = `
         DECLARE $gridX AS UINT32;
         DECLARE $gridY AS UINT32;
         SELECT * FROM GridCells WHERE x = $gridX AND y = $gridY LIMIT 1;
-    `);
-    const { resultSets: cellResultsSet } = await dbSess.executeQuery(cellQuery, {
+    `;
+    const { resultSets: cellResultsSet } = await executeQuery(dbSess, cellQuery, {
         $gridX: TypedValues.uint32(gridX),
         $gridY: TypedValues.uint32(gridY),
     });
@@ -41,13 +42,13 @@ export const canBeCaptured = async (dbSess: Session, playerId: string, gridX: nu
 };
 
 export const startCapture = async (dbSess: Session, playerId: string, gridX: number, gridY: number, durationSec: number) => {
-    const updatePlayerStateQuery = await dbSess.prepareQuery(`
+    const updatePlayerStateQuery = `
         DECLARE $id AS UTF8;
         DECLARE $state AS UTF8;
         UPDATE Users SET state = $state WHERE id = $id;
-    `);
+    `;
 
-    await dbSess.executeQuery(updatePlayerStateQuery, {
+    await executeQuery(dbSess, updatePlayerStateQuery, {
         $id: TypedValues.utf8(playerId),
         $state: TypedValues.utf8(UserState.CAPTURING),
     });

@@ -5,21 +5,22 @@ import { CapturingMessage, UserState } from '../../../common/types';
 import { withDb } from '../../db/with-db';
 import { User } from '../../db/entity/user';
 import { logger } from '../../../common/logger';
+import { executeQuery } from '../../db/execute-query';
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
-    const captureGridCellQuery = await dbSess.prepareQuery(`
+    const captureGridCellQuery = `
         DECLARE $id AS UTF8;
         DECLARE $gridX as UINT32;
         DECLARE $gridY as UINT32;
         
         UPSERT INTO GridCells (x, y, owner_id) VALUES ($gridX, $gridY, $id);
-    `);
-    const updatePlayerStateQuery = await dbSess.prepareQuery(`
+    `;
+    const updatePlayerStateQuery = `
         DECLARE $id as UTF8;
         DECLARE $state as UTF8;
         
         UPDATE Users SET state = $state WHERE id = $id;
-    `);
+    `;
 
     for (const message of event.messages) {
         const capturingMessage: CapturingMessage = JSON.parse(message.details.message.body);
@@ -31,7 +32,7 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
             const coordsAreSame = player.gridX === capturingMessage.gridX && player.gridY === capturingMessage.gridY;
 
             if (coordsAreSame) {
-                await dbSess.executeQuery(captureGridCellQuery, {
+                await executeQuery(dbSess, captureGridCellQuery, {
                     $id: TypedValues.utf8(player.id),
                     $gridX: TypedValues.uint32(capturingMessage.gridX),
                     $gridY: TypedValues.uint32(capturingMessage.gridY),
@@ -39,7 +40,7 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
 
                 player.state = UserState.DEFAULT;
 
-                await dbSess.executeQuery(updatePlayerStateQuery, {
+                await executeQuery(dbSess, updatePlayerStateQuery, {
                     $id: player.getTypedValue('id'),
                     $state: player.getTypedValue('state'),
                 });

@@ -3,6 +3,7 @@ import {
 } from 'ydb-sdk';
 import { Entity } from './entity';
 import { UserState } from '../../../common/types';
+import { executeQuery } from '../execute-query';
 
 interface IUserData {
     id: string;
@@ -65,11 +66,11 @@ export class User extends Entity {
     }
 
     static async findById(dbSess: Session, id: string): Promise<User | undefined> {
-        const query = await dbSess.prepareQuery(`
+        const query = `
             DECLARE $id AS UTF8;
             SELECT * FROM Users WHERE id = $id LIMIT 1;
-        `);
-        const { resultSets } = await dbSess.executeQuery(query, {
+        `;
+        const { resultSets } = await executeQuery(dbSess, query, {
             $id: TypedValues.utf8(id),
         });
         const users = this.fromResultSet(resultSets[0]);
@@ -78,8 +79,7 @@ export class User extends Entity {
     }
 
     static async all(dbSess: Session): Promise<User[]> {
-        const query = await dbSess.prepareQuery('SELECT * FROM Users');
-        const { resultSets } = await dbSess.executeQuery(query);
+        const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM Users');
 
         return this.fromResultSet(resultSets[0]);
     }

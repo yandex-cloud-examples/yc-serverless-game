@@ -2,7 +2,6 @@ import phaser, { Game } from 'phaser';
 import { AssetFiles, AssetKeys } from '../assets';
 import { Grid } from '../objects/grid/grid';
 import { ConfigProvider } from '../game-config/config-provider';
-import { Player } from '../objects/player';
 import { GridCoords } from '../objects/grid/grid-coords';
 import { GridMoveManager } from '../managers/grid-move-manager';
 import { GameState } from '../state/game-state';

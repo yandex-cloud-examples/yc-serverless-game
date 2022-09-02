@@ -7,6 +7,7 @@ import { safeJsonParse } from '../../utils/safe-json-parse';
 import { canBeCaptured, startCapture } from './helpers';
 import { UserState } from '../../../common/types';
 import { CAPTURING_DEFAULT_DURATION_S } from '../../utils/constants';
+import { executeQuery } from '../../db/execute-query';
 
 interface MoveRequest {
     gridX: number;
@@ -40,16 +41,16 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         me.gridY = moveRequest.gridY;
         me.state = UserState.DEFAULT;
 
-        const moveQuery = await dbSess.prepareQuery(`
+        const moveQuery = `
             DECLARE $gridX AS UINT32;
             DECLARE $gridY AS UINT32;
             DECLARE $id AS UTF8;
             DECLARE $state AS UTF8;
             
             UPDATE Users SET state = $state, grid_x = $gridX, grid_y = $gridY WHERE id == $id;
-        `);
+        `;
 
-        await dbSess.executeQuery(moveQuery, {
+        await executeQuery(dbSess, moveQuery, {
             $id: me.getTypedValue('id'),
             $gridX: me.getTypedValue('gridX'),
             $gridY: me.getTypedValue('gridY'),

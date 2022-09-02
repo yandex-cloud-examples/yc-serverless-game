@@ -5,6 +5,7 @@ import { AUTH_COOKIE_NAME } from '../../utils/constants';
 import { getAuthHash, pickAuthParameters } from '../../utils/tg-auth';
 import { User } from '../../db/entity/user';
 import { logger } from '../../../common/logger';
+import { executeQuery } from '../../db/execute-query';
 
 export const handler = withDb<Handler.ApiGatewayAuthorizer>(async (dbSess, event, context) => {
     const authResult: ReturnType<Handler.ApiGatewayAuthorizer> = {
@@ -21,11 +22,11 @@ export const handler = withDb<Handler.ApiGatewayAuthorizer>(async (dbSess, event
             const checkHash = await getAuthHash(authParams);
 
             if (checkHash === authParams.hash) {
-                const userQuery = await dbSess.prepareQuery(`
+                const userQuery = `
                     DECLARE $tgUserId as UTF8;
                     SELECT * FROM Users WHERE tg_user_id == $tgUserId LIMIT 1;
-                `);
-                const { resultSets } = await dbSess.executeQuery(userQuery, {
+                `;
+                const { resultSets } = await executeQuery(dbSess, userQuery, {
                     $tgUserId: TypedValues.utf8(authParams.id),
                 });
                 const users = User.fromResultSet(resultSets[0]);

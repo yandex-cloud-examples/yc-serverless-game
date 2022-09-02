@@ -1,13 +1,14 @@
 import { Session, TypedValues } from 'ydb-sdk';
 import { GameConfig } from '../../common/types';
 import { Config } from '../db/entity/config';
+import { executeQuery } from '../db/execute-query';
 
 export const getGameConfig = async (dbSess: Session, name = 'default'): Promise<GameConfig> => {
-    const query = await dbSess.prepareQuery(`
+    const query = `
         DECLARE $name AS UTF8;
         SELECT * FROM Config WHERE name == $name LIMIT 1;
-    `);
-    const { resultSets } = await dbSess.executeQuery(query, {
+    `;
+    const { resultSets } = await executeQuery(dbSess, query, {
         $name: TypedValues.utf8(name),
     });
     const configs = Config.fromResultSet(resultSets[0]);
