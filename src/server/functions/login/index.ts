@@ -98,8 +98,8 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             DECLARE $tgUsername AS UTF8;
             DECLARE $tgUserId AS UTF8;
             DECLARE $imageType AS UINT8;
-            INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username)
-            VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername);
+            INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username, image_type)
+            VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername, $imageType);
         `;
 
         await executeQuery(dbSess, createUserQuery, {
