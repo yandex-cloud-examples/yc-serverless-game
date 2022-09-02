@@ -1,5 +1,4 @@
 import defaultAvatarImage from './assets/images/default-avatar.png';
-import progressImage from './assets/images/progress.png';
 import mapType1Image from './assets/images/map/type1.svg';
 import mapType2Image from './assets/images/map/type2.svg';
 import mapType3Image from './assets/images/map/type3.svg';
@@ -9,6 +8,7 @@ import playerType2Image from './assets/images/player/type2.png';
 import playerType3Image from './assets/images/player/type3.png';
 import playerType4Image from './assets/images/player/type4.png';
 import backgroundImage from './assets/images/bg.png';
+import timerImage from './assets/images/timer.png';
 
 export const enum AssetKeys {
     Player1 = 'player1',
@@ -20,8 +20,8 @@ export const enum AssetKeys {
     Map3 = 'map3',
     Map4 = 'map4',
     DefaultAvatar = 'default-avatar',
-    Progress = 'progress',
     Background = 'background',
+    Timer = 'timer',
 }
 
 export const AssetFiles: Record<AssetKeys, string> = {
@@ -33,7 +33,7 @@ export const AssetFiles: Record<AssetKeys, string> = {
     [AssetKeys.Map2]: mapType2Image,
     [AssetKeys.Map3]: mapType3Image,
     [AssetKeys.Map4]: mapType4Image,
-    [AssetKeys.Progress]: progressImage,
     [AssetKeys.DefaultAvatar]: defaultAvatarImage,
     [AssetKeys.Background]: backgroundImage,
+    [AssetKeys.Timer]: timerImage,
 };

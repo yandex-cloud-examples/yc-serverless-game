@@ -12,14 +12,14 @@ const PLAYER_ASSET_KEYS: AssetKeys[] = [
     AssetKeys.Player4,
 ];
 
-const PLAYER_ANIMATIONS_CACHE = new Map<AssetKeys, phaser.Animations.Animation>();
-
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyAssetKey: AssetKeys;
     private readonly bodyImage: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
     private readonly avatarImage: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-    private readonly progressIcon: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
-    private readonly progressTween: phaser.Tweens.Tween;
+    private readonly timerIcon: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+
+    private static playerAnimationsCache = new Map<AssetKeys, phaser.Animations.Animation>();
+    private static timerAnimation: phaser.Animations.Animation;
 
     constructor(
         scene: phaser.Scene,
@@ -52,25 +52,20 @@ export class Player extends phaser.GameObjects.Container {
             this.loadAvatar(avatarUrl);
         }
 
-        // Setup progress icon
-        const progressIconsSize = Math.round(playerSize / 1.2);
+        // Setup timer icon
+        const timerIconsSize = Math.round(playerSize / 3);
+        const timerPos = -1.9 * timerIconsSize;
 
-        this.progressIcon = scene.physics.add.image(0, 0, AssetKeys.Progress)
-            .setDisplaySize(progressIconsSize, progressIconsSize)
+        this.timerIcon = scene.physics.add.sprite(timerPos, timerPos, AssetKeys.Timer)
+            .setOrigin(0, 0)
+            .setDisplaySize(timerIconsSize, timerIconsSize)
             .setVisible(false);
-
-        this.progressTween = scene.tweens.add({
-            targets: this.progressIcon,
-            duration: 1000,
-            angle: 360,
-            repeat: -1,
-        });
 
         // Setup container
         this.add([
             this.bodyImage,
             this.avatarImage,
-            this.progressIcon,
+            this.timerIcon,
         ]);
 
         scene.physics.systems.add.existing(this);
@@ -87,7 +82,7 @@ export class Player extends phaser.GameObjects.Container {
     }
 
     private getBodyAnimation() {
-        let anim = PLAYER_ANIMATIONS_CACHE.get(this.bodyAssetKey);
+        let anim = Player.playerAnimationsCache.get(this.bodyAssetKey);
 
         if (!anim) {
             const newAnim = this.scene.anims.create({
@@ -102,10 +97,29 @@ export class Player extends phaser.GameObjects.Container {
 
             anim = newAnim;
 
-            PLAYER_ANIMATIONS_CACHE.set(this.bodyAssetKey, anim);
+            Player.playerAnimationsCache.set(this.bodyAssetKey, anim);
         }
 
         return anim;
+    }
+
+    private getTimerAnimation() {
+        if (!Player.timerAnimation) {
+            const newAnim = this.scene.anims.create({
+                key: 'timer-anim',
+                frames: this.scene.anims.generateFrameNumbers(AssetKeys.Timer, {}),
+                frameRate: 5,
+                repeat: -1,
+            });
+
+            if (!newAnim) {
+                throw new Error('Unable to create animation for timer');
+            }
+
+            Player.timerAnimation = newAnim;
+        }
+
+        return Player.timerAnimation;
     }
 
     private calculateMoveAngle(gridX: number, gridY: number): number {
@@ -156,7 +170,7 @@ export class Player extends phaser.GameObjects.Container {
     moveToGridCell(gridX: number, gridY: number) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
-        this.setAngle(this.calculateMoveAngle(gridX, gridY));
+        this.bodyImage.setAngle(this.calculateMoveAngle(gridX, gridY));
         this.setCapturingState(false);
 
         this.bodyImage.play(this.getBodyAnimation());
@@ -170,6 +184,10 @@ export class Player extends phaser.GameObjects.Container {
     }
 
     setCapturingState(isCapturing: boolean) {
-        this.progressIcon.setVisible(isCapturing);
+        if (isCapturing) {
+            this.timerIcon.play(this.getTimerAnimation(), true);
+        }
+
+        this.timerIcon.setVisible(isCapturing);
     }
 }

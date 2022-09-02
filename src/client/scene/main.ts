@@ -48,7 +48,11 @@ export class MainScene extends phaser.Scene {
 
         // rest
         this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
-        this.load.image(AssetKeys.Progress, AssetFiles[AssetKeys.Progress]);
+        this.load.spritesheet(AssetKeys.Timer, AssetFiles[AssetKeys.Timer], {
+            frameHeight: 31,
+            frameWidth: 31,
+            spacing: 2,
+        });
         this.load.image(AssetKeys.Background, AssetFiles[AssetKeys.Background]);
     }
 
