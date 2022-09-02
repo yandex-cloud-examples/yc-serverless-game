@@ -4,7 +4,7 @@ import { withDb } from '../../db/with-db';
 import { functionResponse } from '../../utils/function-response';
 import { User } from '../../db/entity/user';
 import { safeJsonParse } from '../../utils/safe-json-parse';
-import { canBeCaptured, startCapture } from './helpers';
+import { tryCapture } from './helpers';
 import { UserState } from '../../../common/types';
 import { CAPTURING_DEFAULT_DURATION_S } from '../../utils/constants';
 import { executeQuery } from '../../db/execute-query';
@@ -29,8 +29,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
 
     const meId: string = event.requestContext.authorizer?.userId;
 
-    const users = await User.all(dbSess);
-    const me = users.find((u) => u.id === meId);
+    const me = await User.findById(dbSess, meId);
 
     if (!me) {
         throw new Error(`Unable to find me in DB: ${meId}`);
@@ -57,11 +56,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $state: me.getTypedValue('state'),
         });
 
-        const cellCanBeCaptured = await canBeCaptured(dbSess, meId, me.gridX, me.gridY);
-
-        if (cellCanBeCaptured) {
-            await startCapture(dbSess, meId, me.gridX, me.gridY, CAPTURING_DEFAULT_DURATION_S);
-        }
+        await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
     }
 
     return functionResponse({});

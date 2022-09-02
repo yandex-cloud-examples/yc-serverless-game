@@ -20,28 +20,26 @@ const sqsClient = new SQS({
     },
 });
 
-export const canBeCaptured = async (dbSess: Session, playerId: string, gridX: number, gridY: number): Promise<boolean> => {
-    const player = await User.findById(dbSess, playerId);
-
-    if (!player) {
-        throw new Error(`User ${playerId} not found in DB`);
-    }
-
+export const canBeCaptured = async (dbSess: Session, player: User): Promise<boolean> => {
     const cellQuery = `
         DECLARE $gridX AS UINT32;
         DECLARE $gridY AS UINT32;
         SELECT * FROM GridCells WHERE x = $gridX AND y = $gridY LIMIT 1;
     `;
     const { resultSets: cellResultsSet } = await executeQuery(dbSess, cellQuery, {
-        $gridX: TypedValues.uint32(gridX),
-        $gridY: TypedValues.uint32(gridY),
+        $gridX: TypedValues.uint32(player.gridX),
+        $gridY: TypedValues.uint32(player.gridY),
     });
     const cells = GridCell.fromResultSet(cellResultsSet[0]);
 
-    return cells.length === 0 || cells[0].ownerId !== playerId;
+    return cells.length === 0 || cells[0].ownerId !== player.id;
 };
 
-export const startCapture = async (dbSess: Session, playerId: string, gridX: number, gridY: number, durationSec: number) => {
+export const tryCapture = async (dbSess: Session, player: User, durationSec: number) => {
+    if (!await canBeCaptured(dbSess, player)) {
+        return;
+    }
+
     const updatePlayerStateQuery = `
         DECLARE $id AS UTF8;
         DECLARE $state AS UTF8;
@@ -49,14 +47,14 @@ export const startCapture = async (dbSess: Session, playerId: string, gridX: num
     `;
 
     await executeQuery(dbSess, updatePlayerStateQuery, {
-        $id: TypedValues.utf8(playerId),
+        $id: TypedValues.utf8(player.id),
         $state: TypedValues.utf8(UserState.CAPTURING),
     });
 
     const message: CapturingMessage = {
-        playerId,
-        gridX,
-        gridY,
+        playerId: player.id,
+        gridX: player.gridX,
+        gridY: player.gridY,
     };
 
     await sqsClient.sendMessage({
