@@ -123,6 +123,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         secure: true,
     });
 
+    // TODO: restrict login if maximum active players limit reached
     return {
         statusCode: 302,
         headers: {

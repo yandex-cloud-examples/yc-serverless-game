@@ -57,11 +57,12 @@ export class MainScene extends phaser.Scene {
     }
 
     create() {
+        // TODO: find another way to set background image
         this.add.tileSprite(
             0,
             0,
-            this.worldSize[0] * 10,
-            this.worldSize[1] * 10,
+            this.worldSize[0] * 2,
+            this.worldSize[1] * 2,
             AssetKeys.Background,
         );
 
@@ -69,7 +70,7 @@ export class MainScene extends phaser.Scene {
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const gridStateManager = new GridStateManager(this.gameState, grid);
         const me = playersStateManager.getMe();
-        const gridMoveManager = new GridMoveManager(grid, me, this.apiClient);
+        const gridMoveManager = new GridMoveManager(grid, me, this.apiClient, this.gameState);
         const scoreManager = new ScoreManager(this.gameState, this, '#score');
 
         this.cameras.main.startFollow(me);
