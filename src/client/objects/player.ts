@@ -5,6 +5,8 @@ import { ConfigProvider } from '../game-config/config-provider';
 import { GridCoords } from './grid/grid-coords';
 import { AssetKeys } from '../assets';
 import { PLAYER_MOVE_DURATION_MS } from '../constants';
+import { ValueHolder } from '../../common/utils/value-holder';
+import { logger } from '../../common/logger';
 
 const PLAYER_ASSET_KEYS: AssetKeys[] = [
     AssetKeys.Player1,
@@ -15,9 +17,9 @@ const PLAYER_ASSET_KEYS: AssetKeys[] = [
 
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyAssetKey: AssetKeys;
-    private readonly bodyImage: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-    private readonly avatarImage: CircleMaskImage;
-    private readonly timerIcon: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
+    private readonly bodyImage: ValueHolder<phaser.Types.Physics.Arcade.SpriteWithDynamicBody> = new ValueHolder();
+    private readonly avatarImage: ValueHolder<CircleMaskImage> = new ValueHolder();
+    private readonly timerIcon: ValueHolder<phaser.Types.Physics.Arcade.SpriteWithDynamicBody> = new ValueHolder();
 
     private static playerAnimationsCache = new Map<AssetKeys, phaser.Animations.Animation>();
     private static timerAnimation: phaser.Animations.Animation;
@@ -30,65 +32,85 @@ export class Player extends phaser.GameObjects.Container {
         gridX = 0,
         gridY = 0,
     ) {
-        const { playerSize } = ConfigProvider.getConfig();
-
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
         super(scene, coords[0], coords[1]);
 
-        // Setup body image
         this.bodyAssetKey = PLAYER_ASSET_KEYS[imageType - 1];
-        this.bodyImage = scene.physics.add.sprite(0, 0, this.bodyAssetKey, 2)
-            .setDisplaySize(playerSize, playerSize)
-            .setTint(Number.parseInt(colorHex, 16));
 
-        // Setup avatar image
+        this.initBody(colorHex);
+        this.initAvatar(avatarUrl);
+        this.initTimerIcon();
+
+        scene.physics.systems.add.existing(this);
+    }
+
+    private initBody(colorHex: string) {
+        const { playerSize } = ConfigProvider.getConfig();
+
+        this.bodyImage.set(this.scene.physics.add.sprite(0, 0, this.bodyAssetKey, 2)
+            .setDisplaySize(playerSize, playerSize)
+            .setTint(Number.parseInt(colorHex, 16)));
+
+        this.add(this.bodyImage.get());
+    }
+
+    private async initAvatar(avatarUrl?: string) {
+        const { playerSize } = ConfigProvider.getConfig();
         const avatarSize = Math.round(playerSize / 1.8);
         const avatarPos: [number, number] = [
             0.8 * avatarSize,
             -0.8 * avatarSize,
         ];
 
-        this.avatarImage = new CircleMaskImage(scene, avatarPos[0], avatarPos[1], AssetKeys.DefaultAvatar)
-            .setDisplaySize(avatarSize, avatarSize);
+        let assetKey: string = AssetKeys.DefaultAvatar;
 
         if (avatarUrl) {
-            this.loadAvatar(avatarUrl, avatarSize, avatarPos);
+            const randomKey = `avatar-${uuid.v4()}`;
+
+            this.scene.load.image(randomKey, avatarUrl);
+
+            try {
+                await new Promise<void>((resolve, reject) => {
+                    this.scene.load.once(phaser.Loader.Events.COMPLETE, () => {
+                        this.scene.load.off(phaser.Loader.Events.FILE_LOAD_ERROR, reject);
+
+                        resolve();
+                    });
+                    this.scene.load.once(phaser.Loader.Events.FILE_LOAD_ERROR, () => {
+                        this.scene.load.off(phaser.Loader.Events.COMPLETE, resolve);
+
+                        reject();
+                    });
+
+                    this.scene.load.start();
+                });
+
+                assetKey = randomKey;
+            } catch {
+                logger.warn(`Unable to load avatar image ${avatarUrl}, using default one instead`);
+            }
         }
 
-        // Setup timer icon
+        this.avatarImage.set(new CircleMaskImage(this.scene, avatarPos[0], avatarPos[1], assetKey)
+            .setDisplaySize(avatarSize, avatarSize));
+
+        this.add(this.avatarImage.get());
+    }
+
+    private initTimerIcon() {
+        const { playerSize } = ConfigProvider.getConfig();
         const timerIconsSize = Math.round(playerSize / 3);
         const timerPos = [
             -1.5 * timerIconsSize,
             -1.5 * timerIconsSize,
         ];
 
-        this.timerIcon = scene.physics.add.sprite(timerPos[0], timerPos[1], AssetKeys.Timer)
+        this.timerIcon.set(this.scene.physics.add.sprite(timerPos[0], timerPos[1], AssetKeys.Timer)
             .setDisplaySize(timerIconsSize, timerIconsSize)
-            .setVisible(false);
+            .setVisible(false));
 
-        // Setup container
-        this.add([
-            this.bodyImage,
-            this.avatarImage,
-            this.timerIcon,
-        ]);
-
-        scene.physics.systems.add.existing(this);
-    }
-
-    private loadAvatar(url: string, size: number, pos: [number, number]) {
-        const uniqKey = `avatar-${uuid.v4()}`;
-
-        this.scene.load.image(uniqKey, url);
-        this.scene.load.once(phaser.Loader.Events.COMPLETE, () => {
-            this.avatarImage
-                .setTexture(uniqKey)
-                .setDisplaySize(size, size)
-                .setX(pos[0])
-                .setY(pos[1]);
-        });
-        this.scene.load.start();
+        this.add(this.timerIcon.get());
     }
 
     private getBodyAnimation() {
@@ -180,10 +202,10 @@ export class Player extends phaser.GameObjects.Container {
     moveToGridCell(gridX: number, gridY: number) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
 
-        this.bodyImage.setAngle(this.calculateMoveAngle(gridX, gridY));
+        this.bodyImage.get().setAngle(this.calculateMoveAngle(gridX, gridY));
         this.setCapturingState(false);
 
-        this.bodyImage.play(this.getBodyAnimation());
+        this.bodyImage.get().play(this.getBodyAnimation());
 
         this.scene.tweens.add({
             targets: this,
@@ -195,9 +217,9 @@ export class Player extends phaser.GameObjects.Container {
 
     setCapturingState(isCapturing: boolean) {
         if (isCapturing) {
-            this.timerIcon.play(this.getTimerAnimation(), true);
+            this.timerIcon.get().play(this.getTimerAnimation(), true);
         }
 
-        this.timerIcon.setVisible(isCapturing);
+        this.timerIcon.get().setVisible(isCapturing);
     }
 }
