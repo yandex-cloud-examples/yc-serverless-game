@@ -24,6 +24,21 @@ export class GameState {
         this.updateDiffOnly(this.players, newState.players);
     }
 
+    @action
+    moveMeTo(gridX: number, gridY: number): boolean {
+        const isCellFree = !this.players.some((p) => p.gridX === gridX && p.gridY === gridY);
+
+        // do not allow to move to cell where another player is located
+        if (!isCellFree) {
+            return false;
+        }
+
+        this.me.gridX = gridX;
+        this.me.gridY = gridY;
+
+        return true;
+    }
+
     updateDiffOnly<T>(target: T, source: T) {
         const diff = deepDiff.diff(target, source);
 

@@ -6,10 +6,15 @@ import { GridCell } from '../../db/entity/grid-cell';
 import { CapturingMessage, UserState } from '../../../common/types';
 import { getEnv } from '../../utils/get-env';
 import { executeQuery } from '../../db/execute-query';
+import { MoveRequest } from './types';
+import { getGameConfig } from '../../utils/get-game-config';
+import { ValidationError } from './validation-error';
+import { isPlayerActive } from '../../utils/is-player-active';
 
 const YMQ_WRITER_ACCESS_KEY_ID = getEnv('YMQ_WRITER_ACCESS_KEY_ID');
 const YMQ_WRITER_SECRET_ACCESS_KEY = getEnv('YMQ_WRITER_SECRET_ACCESS_KEY');
 const YMQ_QUEUE_URL = getEnv('YMQ_QUEUE_URL');
+const MAX_MOVE_DISTANCE = 2;
 
 const sqsClient = new SQS({
     region: 'ru-central1',
@@ -62,4 +67,32 @@ export const tryCapture = async (dbSess: Session, player: User, durationSec: num
         MessageBody: JSON.stringify(message),
         DelaySeconds: durationSec,
     });
+};
+
+export const validateMoveRequest = async (dbSess: Session, player: User, moveRequest: MoveRequest): Promise<void> => {
+    if (player.gridX === moveRequest.gridX && player.gridY === moveRequest.gridY) {
+        throw new ValidationError(`Requested to move to same position where player is: ${moveRequest.gridX}:${moveRequest.gridY}`);
+    }
+
+    const gameConfig = await getGameConfig(dbSess);
+    const { worldGridSize } = gameConfig;
+
+    if (moveRequest.gridX >= worldGridSize[0] || moveRequest.gridY >= worldGridSize[1]) {
+        throw new ValidationError(`Requested to move to out of bounds (${worldGridSize[0]}x${worldGridSize[1]})`);
+    }
+
+    const maxDistance = Math.max(
+        Math.abs(player.gridX - moveRequest.gridX),
+        Math.abs(player.gridY - moveRequest.gridY),
+    );
+
+    if (maxDistance > MAX_MOVE_DISTANCE) {
+        throw new ValidationError('Requested to move to distance bigger then allowed');
+    }
+
+    const playerOnCell = await User.findByGridPos(dbSess, moveRequest.gridX, moveRequest.gridY);
+
+    if (playerOnCell && isPlayerActive(gameConfig, playerOnCell)) {
+        throw new ValidationError(`Another player is on this cell: ${moveRequest.gridX}:${moveRequest.gridY}`);
+    }
 };

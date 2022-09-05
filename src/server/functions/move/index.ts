@@ -4,22 +4,15 @@ import { withDb } from '../../db/with-db';
 import { functionResponse } from '../../utils/function-response';
 import { User } from '../../db/entity/user';
 import { safeJsonParse } from '../../utils/safe-json-parse';
-import { tryCapture } from './helpers';
+import { tryCapture, validateMoveRequest } from './helpers';
 import { UserState } from '../../../common/types';
 import { CAPTURING_DEFAULT_DURATION_S } from '../../utils/constants';
 import { executeQuery } from '../../db/execute-query';
+import { MoveRequest } from './types';
+import { ValidationError } from './validation-error';
 
-interface MoveRequest {
-    gridX: number;
-    gridY: number;
-}
-
-// TODO: add restrictions
-// - same position
-// - adjacent
-// - out of bounds
 export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
-    const moveRequest = safeJsonParse<Partial<MoveRequest>>(event.body);
+    const moveRequest = safeJsonParse<MoveRequest>(event.body);
 
     if (typeof moveRequest?.gridX !== 'number' || typeof moveRequest.gridY !== 'number') {
         return functionResponse({
@@ -35,12 +28,21 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         throw new Error(`Unable to find me in DB: ${meId}`);
     }
 
-    if (me.gridX !== moveRequest.gridX || me.gridY !== moveRequest.gridY) {
-        me.gridX = moveRequest.gridX;
-        me.gridY = moveRequest.gridY;
-        me.state = UserState.DEFAULT;
+    try {
+        await validateMoveRequest(dbSess, me, moveRequest);
+    } catch (error) {
+        if (error instanceof ValidationError) {
+            return error.toFunctionResponse();
+        }
 
-        const moveQuery = `
+        throw error;
+    }
+
+    me.gridX = moveRequest.gridX;
+    me.gridY = moveRequest.gridY;
+    me.state = UserState.DEFAULT;
+
+    const moveQuery = `
             DECLARE $gridX AS UINT32;
             DECLARE $gridY AS UINT32;
             DECLARE $id AS UTF8;
@@ -49,15 +51,14 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             UPDATE Users SET state = $state, grid_x = $gridX, grid_y = $gridY WHERE id == $id;
         `;
 
-        await executeQuery(dbSess, moveQuery, {
-            $id: me.getTypedValue('id'),
-            $gridX: me.getTypedValue('gridX'),
-            $gridY: me.getTypedValue('gridY'),
-            $state: me.getTypedValue('state'),
-        });
+    await executeQuery(dbSess, moveQuery, {
+        $id: me.getTypedValue('id'),
+        $gridX: me.getTypedValue('gridX'),
+        $gridY: me.getTypedValue('gridY'),
+        $state: me.getTypedValue('state'),
+    });
 
-        await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
-    }
+    await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
 
     return functionResponse({});
 });

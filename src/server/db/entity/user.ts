@@ -78,6 +78,22 @@ export class User extends Entity {
         return users[0];
     }
 
+    static async findByGridPos(dbSess: Session, gridX: number, gridY: number): Promise<User | undefined> {
+        const query = `
+            DECLARE $gridX AS UINT32;
+            DECLARE $gridY AS UINT32;
+            SELECT * FROM Users WHERE grid_x = $gridX AND grid_y = $gridY LIMIT 1;
+        `;
+
+        const { resultSets } = await executeQuery(dbSess, query, {
+            $gridX: TypedValues.uint32(gridX),
+            $gridY: TypedValues.uint32(gridY),
+        });
+        const users = this.fromResultSet(resultSets[0]);
+
+        return users[0];
+    }
+
     static async all(dbSess: Session): Promise<User[]> {
         const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM Users');
 

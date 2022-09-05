@@ -1,10 +1,10 @@
 import { Session } from 'ydb-sdk';
-import * as dateFns from 'date-fns';
 import { PlayerState, ServerState } from '../../common/types';
 import { User } from '../db/entity/user';
-import { MAX_INACTIVE_S } from './constants';
 import { GridCell } from '../db/entity/grid-cell';
 import { logger } from '../../common/logger';
+import { getGameConfig } from './get-game-config';
+import { isPlayerActive } from './is-player-active';
 
 const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
     const score = gridCells.reduce((value, cell) => {
@@ -29,6 +29,7 @@ const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
 };
 
 export const buildGameState = async (meId: string, dbSess: Session): Promise<ServerState> => {
+    const config = await getGameConfig(dbSess);
     const users = await User.all(dbSess);
     const gridCells = await GridCell.all(dbSess);
 
@@ -39,7 +40,7 @@ export const buildGameState = async (meId: string, dbSess: Session): Promise<Ser
     }
 
     const activeEnemies = users.filter((u) => {
-        return u.id !== meId && dateFns.differenceInSeconds(new Date(), u.lastActive) < MAX_INACTIVE_S;
+        return u.id !== meId && isPlayerActive(config, u);
     });
 
     const serverState: ServerState = {

@@ -9,6 +9,8 @@ interface IConfigData {
     playerSize: number;
     worldSizeX: number;
     worldSizeY: number;
+    maxInactiveSec: number;
+    maxActivePlayers: number;
 }
 
 @withTypeOptions({ namesConversion: snakeToCamelCaseConversion })
@@ -28,6 +30,12 @@ export class Config extends Entity {
     @declareType(Types.UINT32)
     public gridCellSize: number;
 
+    @declareType(Types.UINT32)
+    public maxInactiveSec: number;
+
+    @declareType(Types.UINT8)
+    public maxActivePlayers: number;
+
     constructor(data: IConfigData) {
         super(data);
 
@@ -36,5 +44,7 @@ export class Config extends Entity {
         this.worldSizeY = data.worldSizeY;
         this.playerSize = data.playerSize;
         this.gridCellSize = data.gridCellSize;
+        this.maxInactiveSec = data.maxInactiveSec;
+        this.maxActivePlayers = data.maxActivePlayers;
     }
 }

@@ -2,6 +2,8 @@ export interface GameConfig {
     worldGridSize: [number, number];
     gridCellSize: number;
     playerSize: number;
+    maxInactiveSec: number;
+    maxActivePlayers: number;
 }
 
 export interface GridCellState {
