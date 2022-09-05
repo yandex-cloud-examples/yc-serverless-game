@@ -1,5 +1,6 @@
 import * as phaser from 'phaser';
 import * as uuid from 'uuid';
+import CircleMaskImage from 'phaser3-rex-plugins/plugins/circlemaskimage';
 import { ConfigProvider } from '../game-config/config-provider';
 import { GridCoords } from './grid/grid-coords';
 import { AssetKeys } from '../assets';
@@ -15,7 +16,7 @@ const PLAYER_ASSET_KEYS: AssetKeys[] = [
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyAssetKey: AssetKeys;
     private readonly bodyImage: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
-    private readonly avatarImage: phaser.Types.Physics.Arcade.ImageWithDynamicBody;
+    private readonly avatarImage: CircleMaskImage;
     private readonly timerIcon: phaser.Types.Physics.Arcade.SpriteWithDynamicBody;
 
     private static playerAnimationsCache = new Map<AssetKeys, phaser.Animations.Animation>();
@@ -42,22 +43,27 @@ export class Player extends phaser.GameObjects.Container {
             .setTint(Number.parseInt(colorHex, 16));
 
         // Setup avatar image
-        const avatarSize = Math.round(playerSize / 3);
+        const avatarSize = Math.round(playerSize / 1.8);
+        const avatarPos: [number, number] = [
+            0.8 * avatarSize,
+            -0.8 * avatarSize,
+        ];
 
-        this.avatarImage = scene.physics.add.image(0, 0, AssetKeys.DefaultAvatar)
-            .setDisplaySize(avatarSize, avatarSize)
-            .setVisible(false);
+        this.avatarImage = new CircleMaskImage(scene, avatarPos[0], avatarPos[1], AssetKeys.DefaultAvatar)
+            .setDisplaySize(avatarSize, avatarSize);
 
         if (avatarUrl) {
-            this.loadAvatar(avatarUrl);
+            this.loadAvatar(avatarUrl, avatarSize, avatarPos);
         }
 
         // Setup timer icon
         const timerIconsSize = Math.round(playerSize / 3);
-        const timerPos = -1.9 * timerIconsSize;
+        const timerPos = [
+            -1.5 * timerIconsSize,
+            -1.5 * timerIconsSize,
+        ];
 
-        this.timerIcon = scene.physics.add.sprite(timerPos, timerPos, AssetKeys.Timer)
-            .setOrigin(0, 0)
+        this.timerIcon = scene.physics.add.sprite(timerPos[0], timerPos[1], AssetKeys.Timer)
             .setDisplaySize(timerIconsSize, timerIconsSize)
             .setVisible(false);
 
@@ -71,12 +77,16 @@ export class Player extends phaser.GameObjects.Container {
         scene.physics.systems.add.existing(this);
     }
 
-    private loadAvatar(url: string) {
+    private loadAvatar(url: string, size: number, pos: [number, number]) {
         const uniqKey = `avatar-${uuid.v4()}`;
 
         this.scene.load.image(uniqKey, url);
         this.scene.load.once(phaser.Loader.Events.COMPLETE, () => {
-            this.avatarImage.setTexture(uniqKey);
+            this.avatarImage
+                .setTexture(uniqKey)
+                .setDisplaySize(size, size)
+                .setX(pos[0])
+                .setY(pos[1]);
         });
         this.scene.load.start();
     }

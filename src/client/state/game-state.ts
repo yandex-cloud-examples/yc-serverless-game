@@ -1,7 +1,7 @@
-import { makeObservable, observable, action } from 'mobx';
+import { action, makeObservable, observable } from 'mobx';
 import * as deepDiff from 'deep-diff';
 
-import { ServerState } from '../../common/types';
+import { ServerState, UserState } from '../../common/types';
 import { logger } from '../../common/logger';
 
 export class GameState {
@@ -35,6 +35,7 @@ export class GameState {
 
         this.me.gridX = gridX;
         this.me.gridY = gridY;
+        this.me.state = UserState.DEFAULT;
 
         return true;
     }

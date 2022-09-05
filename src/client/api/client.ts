@@ -15,7 +15,7 @@ const isTimoutError = (error: AxiosError): boolean => {
 };
 
 const isRetryable = (error: AxiosError): boolean => {
-    return axiosRetry.isNetworkError(error) || axiosRetry.isRetryableError(error) || isTimoutError(error);
+    return axiosRetry.isNetworkOrIdempotentRequestError(error) || (isTimoutError(error) && axiosRetry.isIdempotentRequestError(error));
 };
 
 export class ApiClient {

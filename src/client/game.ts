@@ -5,7 +5,7 @@ import { ApiClient } from './api/client';
 import { GameState } from './state/game-state';
 
 export class ServerlessGame {
-    private apiClient: ApiClient;
+    private readonly apiClient: ApiClient;
     private game: phaser.Game | undefined;
 
     constructor() {
