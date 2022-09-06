@@ -5,6 +5,7 @@ import axiosRetry from 'axios-retry';
 import { Mutex } from 'async-mutex';
 import { GameConfig, ServerState } from '../../common/types';
 import { logger } from '../../common/logger';
+import { ApiClient } from './index';
 
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_REQUEST_TIMEOUT_MS = 2000;
@@ -18,7 +19,7 @@ const isRetryable = (error: AxiosError): boolean => {
     return axiosRetry.isNetworkOrIdempotentRequestError(error) || (isTimoutError(error) && axiosRetry.isIdempotentRequestError(error));
 };
 
-export class ApiClient {
+export class HttpClient implements ApiClient {
     private readonly axiosInstance: AxiosInstance;
     private readonly modificationMutex: Mutex;
 

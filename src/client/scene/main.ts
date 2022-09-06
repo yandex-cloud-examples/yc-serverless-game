@@ -6,10 +6,10 @@ import { GridCoords } from '../objects/grid/grid-coords';
 import { GridMoveManager } from '../managers/grid-move-manager';
 import { GameState } from '../state/game-state';
 import { GameStatePoller } from '../state/game-state-poller';
-import { ApiClient } from '../api/client';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
 import { ScoreManager } from '../managers/score-manager';
+import { ApiClient } from '../api';
 
 const PLAYER_SPRITE_FRAME_CONFIG: phaser.Types.Loader.FileTypes.ImageFrameConfig = {
     frameWidth: 81,

@@ -8,6 +8,7 @@ import { getEnv } from '../../src/server/utils/get-env';
 import 'webpack-dev-server'; // for typings augmentation only
 
 const PROXY_TARGET_HOST = getEnv('DEV_SERVER_PROXY_TARGET', 'https://localhost');
+const WS_PROXY_TARGET_HOST = getEnv('DEV_SERVER_WS_PROXY_TARGET', 'wss://localhost');
 
 const config: Configuration = {
     mode: env.isProd ? 'production' : 'development',
@@ -78,14 +79,20 @@ const config: Configuration = {
         allowedHosts: 'all',
         proxy: {
             '/api': {
-                target: `${PROXY_TARGET_HOST}`,
+                target: PROXY_TARGET_HOST,
                 secure: false,
                 changeOrigin: true,
             },
             '/proxy': {
-                target: `${PROXY_TARGET_HOST}`,
+                target: PROXY_TARGET_HOST,
                 secure: false,
                 changeOrigin: true,
+            },
+            '/websocket': {
+                target: WS_PROXY_TARGET_HOST,
+                secure: false,
+                changeOrigin: true,
+                ws: true,
             },
         },
     },

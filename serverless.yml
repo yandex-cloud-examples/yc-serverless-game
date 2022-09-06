@@ -89,6 +89,26 @@ functions:
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
 
+  ws-connect:
+    handler: dist/server/ws-connect.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    environment:
+      LOG_LEVEL: debug
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+
+  ws-disconnect:
+    handler: dist/server/ws-disconnect.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    environment:
+      LOG_LEVEL: debug
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+
 
 resources:
   functions-sa:

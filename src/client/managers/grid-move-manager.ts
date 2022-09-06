@@ -3,8 +3,8 @@ import { bind } from 'bind-decorator';
 import { Grid } from '../objects/grid/grid';
 import { Player } from '../objects/player';
 import { GridCell } from '../objects/grid/grid-cell';
-import { ApiClient } from '../api/client';
 import { GameState } from '../state/game-state';
+import { ApiClient } from '../api';
 
 export class GridMoveManager {
     private selectedCell: GridCell | null = null;
