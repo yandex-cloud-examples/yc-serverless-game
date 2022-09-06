@@ -8,16 +8,24 @@ import { PLAYER_MOVE_DURATION_MS } from '../constants';
 import { ValueHolder } from '../../common/utils/value-holder';
 import { logger } from '../../common/logger';
 
-const PLAYER_ASSET_KEYS: AssetKeys[] = [
-    AssetKeys.Player1,
-    AssetKeys.Player2,
-    AssetKeys.Player3,
-    AssetKeys.Player4,
-];
+interface PlayerAssets {
+    body: AssetKeys,
+    mask: AssetKeys,
+}
+
+const PLAYER_ASSET_KEYS: Record<number, PlayerAssets> = {
+    1: { body: AssetKeys.Player1, mask: AssetKeys.PlayerMask1 },
+    2: { body: AssetKeys.Player2, mask: AssetKeys.PlayerMask2 },
+    3: { body: AssetKeys.Player3, mask: AssetKeys.PlayerMask3 },
+    4: { body: AssetKeys.Player4, mask: AssetKeys.PlayerMask4 },
+};
 
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyAssetKey: AssetKeys;
+    private readonly bodyMaskAssetKey: AssetKeys;
+
     private readonly bodyImage: ValueHolder<phaser.Types.Physics.Arcade.SpriteWithDynamicBody> = new ValueHolder();
+    private readonly bodyMaskImage: ValueHolder<phaser.Types.Physics.Arcade.ImageWithDynamicBody> = new ValueHolder();
     private readonly avatarImage: ValueHolder<CircleMaskImage> = new ValueHolder();
     private readonly timerIcon: ValueHolder<phaser.Types.Physics.Arcade.SpriteWithDynamicBody> = new ValueHolder();
 
@@ -36,7 +44,8 @@ export class Player extends phaser.GameObjects.Container {
 
         super(scene, coords[0], coords[1]);
 
-        this.bodyAssetKey = PLAYER_ASSET_KEYS[imageType - 1];
+        this.bodyAssetKey = PLAYER_ASSET_KEYS[imageType].body;
+        this.bodyMaskAssetKey = PLAYER_ASSET_KEYS[imageType].mask;
 
         this.initBody(colorHex);
         this.initAvatar(avatarUrl);
@@ -49,10 +58,16 @@ export class Player extends phaser.GameObjects.Container {
         const { playerSize } = ConfigProvider.getConfig();
 
         this.bodyImage.set(this.scene.physics.add.sprite(0, 0, this.bodyAssetKey, 2)
+            .setDisplaySize(playerSize, playerSize));
+
+        this.bodyMaskImage.set(this.scene.physics.add.image(0, 0, this.bodyMaskAssetKey)
             .setDisplaySize(playerSize, playerSize)
-            .setTint(Number.parseInt(colorHex, 16)));
+            .setTint(Number.parseInt(colorHex, 16))
+            .setAlpha(0.6)
+            .setVisible(true));
 
         this.add(this.bodyImage.get());
+        this.add(this.bodyMaskImage.get());
     }
 
     private async initAvatar(avatarUrl?: string) {
@@ -201,8 +216,10 @@ export class Player extends phaser.GameObjects.Container {
 
     moveToGridCell(gridX: number, gridY: number) {
         const coords = GridCoords.getCoordsFromGridPos(gridX, gridY);
+        const angle = this.calculateMoveAngle(gridX, gridY);
 
-        this.bodyImage.get().setAngle(this.calculateMoveAngle(gridX, gridY));
+        this.bodyImage.get().setAngle(angle);
+        this.bodyMaskImage.get().setAngle(angle);
         this.setCapturingState(false);
 
         this.bodyImage.get().play(this.getBodyAnimation());

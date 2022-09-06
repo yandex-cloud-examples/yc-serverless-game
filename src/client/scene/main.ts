@@ -45,6 +45,10 @@ export class MainScene extends phaser.Scene {
         this.load.spritesheet(AssetKeys.Player2, AssetFiles[AssetKeys.Player2], PLAYER_SPRITE_FRAME_CONFIG);
         this.load.spritesheet(AssetKeys.Player3, AssetFiles[AssetKeys.Player3], PLAYER_SPRITE_FRAME_CONFIG);
         this.load.spritesheet(AssetKeys.Player4, AssetFiles[AssetKeys.Player4], PLAYER_SPRITE_FRAME_CONFIG);
+        this.load.image(AssetKeys.PlayerMask1, AssetFiles[AssetKeys.PlayerMask1]);
+        this.load.image(AssetKeys.PlayerMask2, AssetFiles[AssetKeys.PlayerMask2]);
+        this.load.image(AssetKeys.PlayerMask3, AssetFiles[AssetKeys.PlayerMask3]);
+        this.load.image(AssetKeys.PlayerMask4, AssetFiles[AssetKeys.PlayerMask4]);
 
         // rest
         this.load.image(AssetKeys.DefaultAvatar, AssetFiles[AssetKeys.DefaultAvatar]);
