@@ -10,10 +10,7 @@ plugins:
   - "@yandex-cloud/serverless-plugin"
 
 package:
-  patterns:
-    - '!**'
-    - dist/server/*.js
-    - dist/server/certs/*
+  individually: true
 
 functions:
   get-state:
@@ -21,6 +18,11 @@ functions:
     memorySize: 512
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/get-state.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -31,6 +33,11 @@ functions:
     memorySize: 128
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/get-config.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -41,6 +48,11 @@ functions:
     memorySize: 512
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/move.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -61,6 +73,11 @@ functions:
           queue: capturing-queue
           batch: 10
           cutoff: 1
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/capture.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -71,6 +88,11 @@ functions:
     memorySize: 128
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/login.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -83,6 +105,11 @@ functions:
     memorySize: 128
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/auth.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -94,6 +121,11 @@ functions:
     memorySize: 128
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/ws-connect.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -104,6 +136,11 @@ functions:
     memorySize: 128
     timeout: 5
     account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/ws-disconnect.js
     environment:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
