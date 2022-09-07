@@ -11,7 +11,7 @@ configure({
     observableRequiresReaction: true,
 });
 
-const serverlessGame = new ServerlessGame();
+const serverlessGame = new ServerlessGame('#game');
 
 serverlessGame.init()
     .then(() => logger.log('Serverless game successfully initialized'))
