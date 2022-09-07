@@ -63,8 +63,7 @@ export class Player extends phaser.GameObjects.Container {
         this.bodyMaskImage.set(this.scene.physics.add.image(0, 0, this.bodyMaskAssetKey)
             .setDisplaySize(playerSize, playerSize)
             .setTint(Number.parseInt(colorHex, 16))
-            .setAlpha(0.6)
-            .setVisible(true));
+            .setAlpha(0.8));
 
         this.add(this.bodyImage.get());
         this.add(this.bodyMaskImage.get());
