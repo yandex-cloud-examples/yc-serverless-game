@@ -85,6 +85,7 @@ export class HttpClient implements ApiClient {
         const response = await this.request<GameConfig>({
             method: 'GET',
             url: '/get-config',
+            timeout: 5000,
         });
 
         return response.data;
