@@ -31,8 +31,6 @@ export class ServerlessGame {
 
         this.game = new phaser.Game({
             type: phaser.AUTO,
-            width: '100%',
-            height: '100%',
             parent: 'game',
             scene: mainScene,
             input: {
@@ -46,6 +44,21 @@ export class ServerlessGame {
             physics: {
                 default: 'arcade',
             },
+            scale: this.getScaleConfig(),
         });
+    }
+
+    private getScaleConfig(): phaser.Types.Core.ScaleConfig {
+        const dpr = window.devicePixelRatio || 1;
+        const zoom = dpr / 3;
+        const whPrc = Math.ceil(100 / zoom);
+
+        return {
+            width: `${whPrc}%`,
+            height: `${whPrc}%`,
+            mode: phaser.Scale.ScaleModes.NONE,
+            autoRound: true,
+            zoom,
+        };
     }
 }
