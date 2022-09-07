@@ -26,6 +26,6 @@ export class ScoreManager {
     updateScore() {
         const { score } = this.gameState.me;
 
-        this.scoreTextContainer.textContent = `Score: ${score}`;
+        this.scoreTextContainer.textContent = `Score: ${score}, Online: ${this.gameState.onlineCount}`;
     }
 }

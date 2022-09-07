@@ -1,4 +1,6 @@
-import { action, makeObservable, observable } from 'mobx';
+import {
+    action, makeObservable, observable, computed,
+} from 'mobx';
 import * as deepDiff from 'deep-diff';
 
 import { ServerState, UserState } from '../../common/types';
@@ -8,6 +10,11 @@ export class GameState {
     @observable me: ServerState['me'];
     @observable players: ServerState['players'];
     @observable grid: ServerState['grid'];
+
+    @computed
+    get onlineCount(): number {
+        return this.players.length + 1;
+    }
 
     constructor(initialState: ServerState) {
         this.me = initialState.me;
