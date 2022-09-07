@@ -42,8 +42,7 @@ export class GridCell extends phaser.GameObjects.Image {
     setSelected() {
         this.isSelected = true;
 
-        this.setTint(0x00_FF_00);
-        this.setAlpha(0.5);
+        this.setTint(0x00_BB_00);
     }
 
     resetState() {
@@ -51,10 +50,8 @@ export class GridCell extends phaser.GameObjects.Image {
 
         if (this.color) {
             this.setTint(Number.parseInt(this.color, 16));
-            this.setAlpha(0.9);
         } else {
             this.clearTint();
-            this.clearAlpha();
         }
     }
 }
