@@ -1,8 +1,8 @@
 import { configure } from 'mobx';
-import { logger } from '../common/logger';
-import { ServerlessGame } from './game';
+import { logger } from '../../common/logger';
+import { ServerlessGame } from '../game';
 
-import './styles/index.pcss';
+import '../styles/index.pcss';
 
 configure({
     enforceActions: 'always',

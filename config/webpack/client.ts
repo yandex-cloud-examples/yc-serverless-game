@@ -12,13 +12,16 @@ const WS_PROXY_TARGET_HOST = getEnv('DEV_SERVER_WS_PROXY_TARGET', 'wss://localho
 
 const config: Configuration = {
     mode: env.isProd ? 'production' : 'development',
-    entry: path.resolve('src/client/index.ts'),
+    entry: {
+        index: path.resolve('src/client/entries/index.ts'),
+        login: path.resolve('src/client/entries/login.ts'),
+    },
     resolve: {
         extensions: ['.ts', '.js'],
     },
     output: {
         path: path.resolve('dist/client'),
-        filename: `static/index${env.isProd ? '-[hash]' : ''}.js`,
+        filename: `static/[name]${env.isProd ? '-[contenthash]' : ''}.js`,
     },
     module: {
         rules: [
@@ -61,11 +64,16 @@ const config: Configuration = {
         new ForkTsCheckerWebpackPlugin(),
         new HtmlWebpackPlugin({
             template: path.resolve('src/client/assets/index.html.ejs'),
+            chunks: [
+                'index',
+            ],
         }),
         new HtmlWebpackPlugin({
             filename: 'login.html',
             template: path.resolve('src/client/assets/login.html.ejs'),
-            inject: false,
+            chunks: [
+                'login',
+            ],
         }),
         new EnvironmentPlugin({
             APP_ENV: 'development',
@@ -75,7 +83,7 @@ const config: Configuration = {
     ],
     devServer: {
         port: 443,
-        https: true,
+        server: 'https',
         allowedHosts: 'all',
         proxy: {
             '/api': {
