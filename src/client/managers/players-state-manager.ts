@@ -39,6 +39,7 @@ export class PlayersStateManager {
                 meState.color,
                 meState.imageType,
                 meState.avatar,
+                false,
                 meState.gridX,
                 meState.gridY,
             );
@@ -66,6 +67,7 @@ export class PlayersStateManager {
                     state.color,
                     state.imageType,
                     state.avatar,
+                    true,
                     state.gridX,
                     state.gridY,
                 );

@@ -37,6 +37,7 @@ export class Player extends phaser.GameObjects.Container {
         colorHex: string,
         imageType: number,
         avatarUrl?: string,
+        showAvatar = true,
         gridX = 0,
         gridY = 0,
     ) {
@@ -48,8 +49,11 @@ export class Player extends phaser.GameObjects.Container {
         this.bodyMaskAssetKey = PLAYER_ASSET_KEYS[imageType].mask;
 
         this.initBody(colorHex);
-        this.initAvatar(avatarUrl);
         this.initTimerIcon();
+
+        if (showAvatar) {
+            this.initAvatar(avatarUrl);
+        }
 
         scene.physics.systems.add.existing(this);
     }
