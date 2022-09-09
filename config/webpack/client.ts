@@ -46,6 +46,13 @@ const config: Configuration = {
                 },
             },
             {
+                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'static/[contenthash].[ext]',
+                },
+            },
+            {
                 test: /\.pcss$/,
                 use: [
                     'style-loader',
@@ -57,6 +64,7 @@ const config: Configuration = {
                                 plugins: [
                                     'postcss-preset-env',
                                     'postcss-nested',
+                                    'postcss-import',
                                 ],
                             },
                         },
@@ -78,6 +86,13 @@ const config: Configuration = {
             template: path.resolve('src/client/assets/login.html.ejs'),
             chunks: [
                 'login',
+            ],
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'stats.html',
+            template: path.resolve('src/client/assets/stats.html.ejs'),
+            chunks: [
+                'stats',
             ],
         }),
         new EnvironmentPlugin({
