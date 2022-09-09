@@ -57,23 +57,14 @@ export class MainScene extends phaser.Scene {
             frameWidth: 31,
             spacing: 2,
         });
-        this.load.image(AssetKeys.Background, AssetFiles[AssetKeys.Background]);
     }
 
     create() {
-        // TODO: find another way to set background image
-        this.add.tileSprite(
-            0,
-            0,
-            this.worldSize[0] * 2,
-            this.worldSize[1] * 2,
-            AssetKeys.Background,
-        );
-
         const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
-        const gridStateManager = new GridStateManager(this.gameState, grid);
         const me = playersStateManager.getMe();
+
+        const gridStateManager = new GridStateManager(this.gameState, grid);
         const gridMoveManager = new GridMoveManager(grid, me, this.apiClient, this.gameState);
         const scoreManager = new ScoreManager(this.gameState, this, '#score');
 

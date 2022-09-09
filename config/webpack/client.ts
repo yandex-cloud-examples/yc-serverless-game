@@ -34,6 +34,11 @@ const config: Configuration = {
                 },
             },
             {
+                test: /\.js$/,
+                enforce: 'pre',
+                use: ['source-map-loader'],
+            },
+            {
                 test: /\.(png|jpe?g|gif|svg)$/i,
                 loader: 'file-loader',
                 options: {
