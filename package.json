@@ -7,6 +7,7 @@
     "lint": "eslint src config",
     "build:client": "webpack --config config/webpack/client.ts",
     "build:server": "webpack --config config/webpack/server.ts",
+    "prebuild": "rm -rf dist/",
     "build": "run-p build:client build:server",
     "deploy:serverless": "serverless deploy",
     "deploy:static": "ts-node scripts/upload-to-s3.ts",
