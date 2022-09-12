@@ -1,1 +1,1 @@
-import '../styles/login.pcss';
+import '../styles/pages/login.pcss';

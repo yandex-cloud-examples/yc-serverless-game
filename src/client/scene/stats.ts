@@ -1,24 +1,32 @@
 import { Grid } from '../objects/grid/grid';
-import { GridMoveManager } from '../managers/grid-move-manager';
 import { GameStatePoller } from '../state/game-state-poller';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
-import { ScoreManager } from '../managers/score-manager';
 import { BaseScene } from './base';
 
-export class MainScene extends BaseScene {
+export class StatsScene extends BaseScene {
     create() {
         const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
-        const me = playersStateManager.getMe();
         const gridStateManager = new GridStateManager(this.gameState, grid);
-        const gridMoveManager = new GridMoveManager(grid, me, this.apiClient, this.gameState);
-        const scoreManager = new ScoreManager(this.gameState, this, '#score');
         const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
 
-        this.cameras.main.startFollow(me);
         this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
 
+        this.cameras.main.setZoom(this.calculateZoom());
+        this.cameras.main.centerOn(this.worldSize[0] / 2, this.worldSize[1] / 2);
+
         gameStatePoller.start();
+        playersStateManager.getMe().setVisible(false);
+    }
+
+    private calculateZoom() {
+        const { worldSize, game: { canvas } } = this;
+        const clientSize = [canvas.clientWidth, canvas.clientHeight];
+        const wRatio = clientSize[0] / worldSize[0];
+        const hRatio = clientSize[1] / worldSize[1];
+        const ratio = Math.min(wRatio, hRatio);
+
+        return Math.round(ratio * 100) / 100;
     }
 }

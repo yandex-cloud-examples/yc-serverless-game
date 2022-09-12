@@ -1,9 +1,9 @@
 import { configure } from 'mobx';
 import { logger } from '../../common/logger';
 import { ServerlessGame } from '../game';
-import { MainScene } from '../scene/main';
+import { StatsScene } from '../scene/stats';
 
-import '../styles/pages/index.pcss';
+import '../styles/pages/stats.pcss';
 
 configure({
     enforceActions: 'always',
@@ -12,7 +12,7 @@ configure({
     observableRequiresReaction: true,
 });
 
-const serverlessGame = new ServerlessGame('#game', MainScene);
+const serverlessGame = new ServerlessGame('#game', StatsScene, false);
 
 serverlessGame.init()
     .then(() => logger.log('Serverless game successfully initialized'))

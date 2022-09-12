@@ -2,20 +2,24 @@ import phaser from 'phaser';
 import { bind } from 'bind-decorator';
 import { debounce } from 'lodash';
 import { ConfigProvider } from './game-config/config-provider';
-import { MainScene } from './scene/main';
 import { HttpClient } from './api/http-client';
 import { GameState } from './state/game-state';
 import { WsClient } from './api/ws-client';
+import { BaseScene } from './scene/base';
 
-export class ServerlessGame {
+export class ServerlessGame<S extends typeof BaseScene> {
     private readonly httpApiClient: HttpClient;
     private readonly wsApiClient: WsClient;
     private readonly parentEl: HTMLElement;
+    private readonly SceneClass: S;
+    private readonly autoScale: boolean;
+
     private game: phaser.Game | undefined;
 
-    constructor(parentElementSelector: string) {
+    constructor(parentElementSelector: string, SceneClass: S, autoScale = true) {
         this.httpApiClient = new HttpClient();
         this.wsApiClient = new WsClient(this.httpApiClient);
+        this.SceneClass = SceneClass;
 
         const parentEl = document.querySelector<HTMLElement>(parentElementSelector);
 
@@ -24,6 +28,7 @@ export class ServerlessGame {
         }
 
         this.parentEl = parentEl;
+        this.autoScale = autoScale;
     }
 
     async init() {
@@ -38,7 +43,7 @@ export class ServerlessGame {
 
         ConfigProvider.init(gameConfig);
 
-        const mainScene = new MainScene(gameState, this.httpApiClient);
+        const mainScene = new this.SceneClass(gameState, this.httpApiClient);
 
         this.game = new phaser.Game({
             type: phaser.AUTO,
@@ -58,7 +63,9 @@ export class ServerlessGame {
             scale: this.getScaleConfig(),
         });
 
-        window.addEventListener('resize', debounce(this.onWindowResize, 300));
+        if (this.autoScale) {
+            window.addEventListener('resize', debounce(this.onWindowResize, 300));
+        }
     }
 
     @bind
@@ -72,6 +79,13 @@ export class ServerlessGame {
     }
 
     private getScaleConfig(): phaser.Types.Core.ScaleConfig {
+        if (!this.autoScale) {
+            return {
+                width: '100%',
+                height: '100%',
+            };
+        }
+
         const dpr = window.devicePixelRatio || 1;
         const zoom = dpr / 3;
         const parentWidth = Math.ceil(this.parentEl.clientWidth / zoom);
