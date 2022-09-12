@@ -10,13 +10,15 @@ import { ApiClient } from './index';
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_REQUEST_TIMEOUT_MS = 2000;
 const DEFAULT_BASE_URL = '/api/';
+const IDEMPOTENT_HTTP_METHODS = new Set(['put', 'delete', 'get', 'head', 'options']);
 
 const isTimoutError = (error: AxiosError): boolean => {
     return error.code === 'ECONNABORTED';
 };
 
 const isRetryable = (error: AxiosError): boolean => {
-    return axiosRetry.isNetworkOrIdempotentRequestError(error) || (isTimoutError(error) && axiosRetry.isIdempotentRequestError(error));
+    return axiosRetry.isNetworkOrIdempotentRequestError(error)
+        || (isTimoutError(error) && IDEMPOTENT_HTTP_METHODS.has(error.config?.method || ''));
 };
 
 export class HttpClient implements ApiClient {
