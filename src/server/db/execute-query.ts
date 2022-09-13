@@ -1,4 +1,6 @@
-import { Session, Ydb, ExecuteQuerySettings } from 'ydb-sdk';
+import {
+    Session, Ydb, ExecuteQuerySettings, withRetries, RetryParameters,
+} from 'ydb-sdk';
 
 interface IQueryParams {
     [k: string]: Ydb.ITypedValue;
@@ -6,7 +8,12 @@ interface IQueryParams {
 
 const querySettings = new ExecuteQuerySettings()
     .withKeepInCache(true);
+const retrySettings = new RetryParameters({
+    maxRetries: 2,
+});
 
 export const executeQuery = async (dbSess: Session, queryStr: string, queryParams?: IQueryParams) => {
-    return dbSess.executeQuery(queryStr, queryParams, undefined, querySettings);
+    return withRetries(() => {
+        return dbSess.executeQuery(queryStr, queryParams, undefined, querySettings);
+    }, retrySettings);
 };
