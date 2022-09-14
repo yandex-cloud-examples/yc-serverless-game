@@ -22,7 +22,9 @@ const PlayerTopItem = (props: PlayerTopItemPros) => {
               <div class="players-top-item-login">${props.name}</div>
               <div class="players-top-item-score">${props.score}</div>
           </div>
-          <div class="players-top-item-color-box" style="background-color: #${props.color}"></div>
+          <div class="players-top-item-color">
+              <div class="players-top-item-color-box" style="background-color: #${props.color}"></div>
+          </div>
       </div>
     `;
 };

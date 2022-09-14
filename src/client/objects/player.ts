@@ -20,6 +20,11 @@ const PLAYER_ASSET_KEYS: Record<number, PlayerAssets> = {
     4: { body: AssetKeys.Player4, mask: AssetKeys.PlayerMask4 },
 };
 
+const playersAnimationCache = new Map<AssetKeys, phaser.Animations.Animation>();
+const timerAnimation: ValueHolder<phaser.Animations.Animation> = new ValueHolder();
+
+const BODY_MASK_ALPHA = 0.6;
+
 export class Player extends phaser.GameObjects.Container {
     private readonly bodyAssetKey: AssetKeys;
     private readonly bodyMaskAssetKey: AssetKeys;
@@ -28,9 +33,6 @@ export class Player extends phaser.GameObjects.Container {
     private readonly bodyMaskImage: ValueHolder<phaser.Types.Physics.Arcade.ImageWithDynamicBody> = new ValueHolder();
     private readonly avatarImage: ValueHolder<CircleMaskImage> = new ValueHolder();
     private readonly timerIcon: ValueHolder<phaser.Types.Physics.Arcade.SpriteWithDynamicBody> = new ValueHolder();
-
-    private static playerAnimationsCache = new Map<AssetKeys, phaser.Animations.Animation>();
-    private static timerAnimation: phaser.Animations.Animation;
 
     constructor(
         scene: phaser.Scene,
@@ -67,7 +69,7 @@ export class Player extends phaser.GameObjects.Container {
         this.bodyMaskImage.set(this.scene.physics.add.image(0, 0, this.bodyMaskAssetKey)
             .setDisplaySize(playerSize, playerSize)
             .setTint(Number.parseInt(colorHex, 16))
-            .setAlpha(0.8));
+            .setAlpha(BODY_MASK_ALPHA));
 
         this.add(this.bodyImage.get());
         this.add(this.bodyMaskImage.get());
@@ -132,7 +134,7 @@ export class Player extends phaser.GameObjects.Container {
     }
 
     private getBodyAnimation() {
-        let anim = Player.playerAnimationsCache.get(this.bodyAssetKey);
+        let anim = playersAnimationCache.get(this.bodyAssetKey);
 
         if (!anim) {
             const newAnim = this.scene.anims.create({
@@ -147,14 +149,14 @@ export class Player extends phaser.GameObjects.Container {
 
             anim = newAnim;
 
-            Player.playerAnimationsCache.set(this.bodyAssetKey, anim);
+            playersAnimationCache.set(this.bodyAssetKey, anim);
         }
 
         return anim;
     }
 
     private getTimerAnimation() {
-        if (!Player.timerAnimation) {
+        if (!timerAnimation.hasValue()) {
             const newAnim = this.scene.anims.create({
                 key: 'timer-anim',
                 frames: this.scene.anims.generateFrameNumbers(AssetKeys.Timer, {}),
@@ -166,10 +168,10 @@ export class Player extends phaser.GameObjects.Container {
                 throw new Error('Unable to create animation for timer');
             }
 
-            Player.timerAnimation = newAnim;
+            timerAnimation.set(newAnim);
         }
 
-        return Player.timerAnimation;
+        return timerAnimation.get();
     }
 
     private calculateMoveAngle(gridX: number, gridY: number): number {

@@ -10,6 +10,7 @@ const PLAYER_SPRITE_FRAME_CONFIG: phaser.Types.Loader.FileTypes.ImageFrameConfig
     frameHeight: 81,
 };
 
+// TODO: set background
 export class BaseScene extends phaser.Scene {
     protected gameState: GameState;
     protected apiClient: ApiClient;

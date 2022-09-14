@@ -3,8 +3,12 @@ import { AssetKeys } from '../../assets';
 import { ConfigProvider } from '../../game-config/config-provider';
 import { GridCoords } from './grid-coords';
 
+const COLOR_MASK_ALPHA = 0.4;
+const SELECTED_COLOR = 0x00_DD_00;
+
 export class GridCell extends phaser.GameObjects.Image {
     private color: string | undefined = undefined;
+    private colorMask: phaser.GameObjects.Rectangle;
     private isSelected = false;
 
     constructor(scene: phaser.Scene, assetKey: AssetKeys, gridX: number, gridY: number) {
@@ -16,6 +20,16 @@ export class GridCell extends phaser.GameObjects.Image {
         scene.add.existing(this);
 
         this.setDisplaySize(gridCellSize, gridCellSize);
+
+        // init color mask
+        this.colorMask = this.scene.add.rectangle(
+            coords[0],
+            coords[1],
+            gridCellSize,
+            gridCellSize,
+            undefined,
+            COLOR_MASK_ALPHA,
+        ).setVisible(false);
     }
 
     getGridPos(): [number, number] {
@@ -42,16 +56,20 @@ export class GridCell extends phaser.GameObjects.Image {
     setSelected() {
         this.isSelected = true;
 
-        this.setTint(0x00_BB_00);
+        this.colorMask
+            .setFillStyle(SELECTED_COLOR, COLOR_MASK_ALPHA)
+            .setVisible(true);
     }
 
     resetState() {
         this.isSelected = false;
 
         if (this.color) {
-            this.setTint(Number.parseInt(this.color, 16));
+            this.colorMask
+                .setFillStyle(Number.parseInt(this.color, 16), COLOR_MASK_ALPHA)
+                .setVisible(true);
         } else {
-            this.clearTint();
+            this.colorMask.setVisible(false);
         }
     }
 }
