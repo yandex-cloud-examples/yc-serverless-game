@@ -29,6 +29,7 @@ export class GameStatePoller {
         private readonly apiClient: ApiClient,
         private readonly gameState: GameState,
         private readonly pollDelay: number = DEFAULT_POLL_DELAY_MS,
+        private readonly withStats: boolean = false,
     ) {
         PageVisibility.change(this.visibilityChangeHandler);
 
@@ -75,7 +76,7 @@ export class GameStatePoller {
             if (this.state === PollingState.POLLING) {
                 try {
                     // eslint-disable-next-line no-await-in-loop
-                    const severState = await this.apiClient.getState();
+                    const severState = await this.apiClient.getState(this.withStats);
 
                     logger.debug('Got new state from server', severState);
 

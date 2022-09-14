@@ -15,7 +15,8 @@ const probablyCall = <F extends (...args: unknown[]) => R, R>(probability: numbe
 
 export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
     const meId: string = event.requestContext.authorizer?.userId;
-    const serverState = await buildGameState(meId, dbSess);
+    const withStats = Boolean(event.queryStringParameters.withStats);
+    const serverState = await buildGameState(meId, dbSess, withStats);
 
     // Do not update lastActive in every `get-state` in order to avoid overhead
     await probablyCall(0.2, () => updateLastActive(meId, dbSess));

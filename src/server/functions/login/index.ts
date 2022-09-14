@@ -1,6 +1,7 @@
 import * as cookie from 'cookie';
 import { Handler } from '@yandex-cloud/function-types';
 import * as uuid from 'uuid';
+import { padStart } from 'lodash';
 import { withDb } from '../../db/with-db';
 import { AUTH_COOKIE_MAX_AGE, AUTH_COOKIE_NAME, PLAYER_IMAGE_TYPES_NUM } from '../../utils/constants';
 import { functionResponse } from '../../utils/function-response';
@@ -51,7 +52,7 @@ const getRandomColor = (existingColors: string[]): string => {
     const randomNum = (Math.random() - 0.5) * randomBounds;
     const colorNum = Math.abs(Math.round(startingColor + distance / 2 + randomNum));
 
-    return Math.min(colorNum, MAX_COLOR).toString(16);
+    return padStart(Math.min(colorNum, MAX_COLOR).toString(16), 6, '0');
 };
 
 export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {

@@ -65,13 +65,16 @@ export class HttpClient implements ApiClient {
     }
 
     // Returns undefined in case of state is possible stale
-    async getState() {
+    async getState(withStats = false) {
         let result: ServerState | undefined;
 
         const response = await this.modificationMutex.runExclusive(async () => {
             return this.request<ServerState>({
                 method: 'GET',
                 url: '/get-state',
+                params: {
+                    withStats: withStats || undefined,
+                },
             });
         });
 

@@ -1,15 +1,15 @@
 import {
     action, makeObservable, observable, computed,
 } from 'mobx';
-import * as deepDiff from 'deep-diff';
 
 import { ServerState, UserState } from '../../common/types';
-import { logger } from '../../common/logger';
+import { updateDiff } from '../../common/utils/update-diff';
 
 export class GameState {
     @observable me: ServerState['me'];
     @observable players: ServerState['players'];
     @observable grid: ServerState['grid'];
+    @observable stats: ServerState['stats'];
 
     @computed
     get onlineCount(): number {
@@ -20,15 +20,17 @@ export class GameState {
         this.me = initialState.me;
         this.players = initialState.players;
         this.grid = initialState.grid;
+        this.stats = initialState.stats;
 
         makeObservable(this);
     }
 
     @action
     update(newState: ServerState) {
-        this.updateDiffOnly(this.me, newState.me);
-        this.updateDiffOnly(this.grid, newState.grid);
-        this.updateDiffOnly(this.players, newState.players);
+        updateDiff(this.me, newState.me);
+        updateDiff(this.grid, newState.grid);
+        updateDiff(this.players, newState.players);
+        updateDiff(this.stats, newState.stats);
     }
 
     @action
@@ -45,17 +47,5 @@ export class GameState {
         this.me.state = UserState.DEFAULT;
 
         return true;
-    }
-
-    updateDiffOnly<T>(target: T, source: T) {
-        const diff = deepDiff.diff(target, source);
-
-        if (diff?.length) {
-            for (const diffItem of diff) {
-                deepDiff.applyChange(target, source, diffItem);
-            }
-        } else {
-            logger.debug('There is not diff in old and new state');
-        }
     }
 }

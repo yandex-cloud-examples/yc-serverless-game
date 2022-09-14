@@ -5,7 +5,75 @@ body {
     padding: 0;
 }
 
-#game {
-    width: 100%;
+#container {
+    background: #000000;
+    display: flex;
+
     height: 100vh;
+
+    #game {
+        width: calc(100vw - 405px);
+        max-width: calc(100vw - 405px);
+    }
+
+    #stats {
+        width: 400px;
+
+        margin: 5px;
+        padding: 25px 0 10px 20px;
+
+        background: #323131;
+        color: #ffffff;
+        box-shadow: inset 6px 6px 0 rgba(255, 255, 255, 0.4), inset -6px -6px 0 rgba(0, 0, 0, 0.4);
+
+        #stats-header {
+            font-size: 26px;
+            margin-bottom: 15px;
+        }
+
+        #stats-body {
+            .players-top-item {
+                display: flex;
+                margin-bottom: 10px;
+                font-size: 12px;
+
+                .players-top-item-num {
+                    width: 25px;
+                    align-self: center;
+                    margin-right: 15px;
+                }
+
+                .players-top-item-avatar {
+                    img {
+                        width: 35px;
+                        height: 35px;
+                        border-radius: 20px;
+                    }
+                    margin-right: 10px;
+                }
+
+                .players-top-item-mid-container {
+                    align-self: center;
+                    width: 250px;
+
+                    .players-top-item-login {
+                        color: rgba(255, 255, 255, 0.6);
+                        margin-bottom: 5px;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                    }
+                }
+
+                .players-top-item-color-box {
+                    align-self: center;
+                    margin-left: auto;
+                    margin-right: 15px;
+                    opacity: 0.7;
+
+                    width: 15px;
+                    height: 15px;
+                }
+            }
+        }
+    }
 }

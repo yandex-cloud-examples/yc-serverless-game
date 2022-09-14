@@ -46,7 +46,7 @@ export class WsClient implements ApiClient {
         return this.httpClient.getConfig();
     }
 
-    async getState() {
-        return this.httpClient.getState();
+    async getState(withStats = false) {
+        return this.httpClient.getState(withStats);
     }
 }

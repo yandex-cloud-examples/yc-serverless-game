@@ -6,15 +6,7 @@ import { logger } from '../../common/logger';
 import { getGameConfig } from './get-game-config';
 import { isPlayerActive } from './is-player-active';
 
-const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
-    const score = gridCells.reduce((value, cell) => {
-        if (cell.ownerId === user.id) {
-            return value + 10;
-        }
-
-        return value;
-    }, 0);
-
+export const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
     return {
         id: user.id,
         name: user.tgUsername,
@@ -24,11 +16,11 @@ const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerState => {
         gridX: user.gridX,
         gridY: user.gridY,
         imageType: user.imageType,
-        score,
+        score: user.calculateScore(gridCells),
     };
 };
 
-export const buildGameState = async (meId: string, dbSess: Session): Promise<ServerState> => {
+export const buildGameState = async (meId: string, dbSess: Session, withStats = false): Promise<ServerState> => {
     const config = await getGameConfig(dbSess);
     const users = await User.all(dbSess);
     const gridCells = await GridCell.all(dbSess);
@@ -47,6 +39,7 @@ export const buildGameState = async (meId: string, dbSess: Session): Promise<Ser
         grid: {},
         players: [],
         me: userToPlayerState(me, gridCells),
+        stats: {},
     };
 
     for (const enemy of activeEnemies) {
@@ -67,6 +60,13 @@ export const buildGameState = async (meId: string, dbSess: Session): Promise<Ser
         } else {
             logger.error(`Unable to find owner for cell ${cell.x}:${cell.y}`);
         }
+    }
+
+    if (withStats) {
+        serverState.stats.topPlayers = users
+            .map((u) => userToPlayerState(u, gridCells))
+            .sort((a, b) => b.score - a.score)
+            .slice(0, 15);
     }
 
     return serverState;

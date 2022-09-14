@@ -4,6 +4,8 @@ import {
 import { Entity } from './entity';
 import { UserState } from '../../../common/types';
 import { executeQuery } from '../execute-query';
+import { GridCell } from './grid-cell';
+import { SCORE_FOR_CELL } from '../../utils/constants';
 
 interface IUserData {
     id: string;
@@ -68,6 +70,11 @@ export class User extends Entity {
         this.state = data.state;
         this.imageType = data.imageType;
         this.wsConnectionId = data.wsConnectionId;
+    }
+
+    // TODO: extract owned cells number from DB
+    calculateScore(gridCells: GridCell[]): number {
+        return gridCells.filter((c) => c.ownerId === this.id).length * SCORE_FOR_CELL;
     }
 
     static async findById(dbSess: Session, id: string): Promise<User | undefined> {

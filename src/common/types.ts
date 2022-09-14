@@ -27,10 +27,15 @@ export interface PlayerState {
     imageType: number;
 }
 
+export interface Stats {
+    topPlayers?: PlayerState[]
+}
+
 export interface ServerState {
     grid: Record<number, Record<number, GridCellState>>;
     me: PlayerState;
     players: PlayerState[];
+    stats: Stats;
 }
 
 export interface CapturingMessage {

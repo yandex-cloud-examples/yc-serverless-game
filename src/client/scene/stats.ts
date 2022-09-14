@@ -3,15 +3,15 @@ import { GameStatePoller } from '../state/game-state-poller';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
 import { BaseScene } from './base';
+import { GameStatsManager } from '../managers/game-stats-manager';
 
 export class StatsScene extends BaseScene {
     create() {
         const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const gridStateManager = new GridStateManager(this.gameState, grid);
-        const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
-
-        this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
+        const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState, undefined, true);
+        const gameStatsManager = new GameStatsManager(this.gameState, '#stats-body');
 
         this.cameras.main.setZoom(this.calculateZoom());
         this.cameras.main.centerOn(this.worldSize[0] / 2, this.worldSize[1] / 2);

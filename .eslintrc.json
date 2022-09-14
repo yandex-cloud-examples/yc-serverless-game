@@ -55,6 +55,7 @@
     "unicorn/no-static-only-class": "off",
     "arrow-body-style": "off",
     "unicorn/prefer-top-level-await": "off",
-    "no-await-in-loop": "off"
+    "no-await-in-loop": "off",
+    "prefer-destructuring": "off"
   }
 }
