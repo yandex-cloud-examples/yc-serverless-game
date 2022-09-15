@@ -3,7 +3,7 @@ import { GridMoveManager } from '../managers/grid-move-manager';
 import { GameStatePoller } from '../state/game-state-poller';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
-import { ScoreManager } from '../managers/score-manager';
+import { HeaderInfoManager } from '../managers/header-info-manager';
 import { BaseScene } from './base';
 
 export class MainScene extends BaseScene {
@@ -13,7 +13,7 @@ export class MainScene extends BaseScene {
         const me = playersStateManager.getMe();
         const gridStateManager = new GridStateManager(this.gameState, grid);
         const gridMoveManager = new GridMoveManager(grid, me, this.apiClient, this.gameState);
-        const scoreManager = new ScoreManager(this.gameState, this, '#score');
+        const scoreManager = new HeaderInfoManager(this.gameState, this, '#header');
         const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
 
         this.cameras.main.startFollow(me);

@@ -68,6 +68,7 @@ const config: Configuration = {
                                     'postcss-nested',
                                     'postcss-import',
                                     'postcss-url',
+                                    'autoprefixer',
                                 ],
                             },
                         },
