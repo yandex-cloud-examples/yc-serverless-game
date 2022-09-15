@@ -10,7 +10,8 @@ export const userToPlayerState = (user: User, gridCells: GridCell[]): PlayerStat
     return {
         id: user.id,
         name: user.tgUsername,
-        avatar: user.tgAvatar,
+        // select smallest possible size of avatar
+        avatar: user.tgAvatar?.replace('/320/', '/160/'),
         color: user.color,
         state: user.state,
         gridX: user.gridX,
