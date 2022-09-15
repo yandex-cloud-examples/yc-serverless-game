@@ -10,6 +10,7 @@ import { User } from '../../db/entity/user';
 import { UserState } from '../../../common/types';
 import { getGameConfig } from '../../utils/get-game-config';
 import { executeQuery } from '../../db/execute-query';
+import { isPlayerActive } from '../../utils/is-player-active';
 
 const TG_CDN_PREFIX = 'https://t.me/i/userpic';
 
@@ -65,11 +66,21 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         }, 400);
     }
 
+    const gameConfig = await getGameConfig(dbSess);
     const users = await User.all(dbSess);
     const isRegistered = users.some((u) => u.tgUserId === authParameters.id);
+    const online = users.filter((u) => isPlayerActive(gameConfig, u)).length;
+
+    if (online >= gameConfig.maxActivePlayers) {
+        return {
+            statusCode: 302,
+            headers: {
+                Location: `/limit.html?limit=${gameConfig.maxActivePlayers}`,
+            },
+        };
+    }
 
     if (!isRegistered) {
-        const gameConfig = await getGameConfig(dbSess);
         const existingColors = users.map((u) => u.color);
         const randomColor = getRandomColor(existingColors);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
@@ -124,7 +135,6 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         secure: true,
     });
 
-    // TODO: restrict login if maximum active players limit reached
     return {
         statusCode: 302,
         headers: {

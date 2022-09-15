@@ -17,6 +17,7 @@ const config: Configuration = {
         index: path.resolve('src/client/entries/index.ts'),
         login: path.resolve('src/client/entries/login.ts'),
         stats: path.resolve('src/client/entries/stats.ts'),
+        limit: path.resolve('src/client/entries/limit.ts'),
     },
     resolve: {
         extensions: ['.ts', '.js'],
@@ -90,6 +91,13 @@ const config: Configuration = {
             template: path.resolve('src/client/assets/stats.html.ejs'),
             chunks: [
                 'stats',
+            ],
+        }),
+        new HtmlWebpackPlugin({
+            filename: 'limit.html',
+            template: path.resolve('src/client/assets/limit.html.ejs'),
+            chunks: [
+                'limit',
             ],
         }),
         new EnvironmentPlugin({
