@@ -41,17 +41,10 @@ const config: Configuration = {
                 use: ['source-map-loader'],
             },
             {
-                test: /\.(png|jpe?g|gif|svg)$/i,
-                loader: 'file-loader',
-                options: {
-                    outputPath: 'static/images',
-                },
-            },
-            {
-                test: /\.(woff|woff2|eot|ttf|otf)$/i,
+                test: /\.(png|jpe?g|gif|svg|woff|woff2|eot|ttf|otf)$/i,
                 type: 'asset/resource',
                 generator: {
-                    filename: 'static/[contenthash].[ext]',
+                    filename: 'static/[contenthash][ext]',
                 },
             },
             {
