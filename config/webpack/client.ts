@@ -2,6 +2,7 @@ import * as path from 'path';
 import { Configuration, EnvironmentPlugin } from 'webpack';
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 import HtmlWebpackPlugin from 'html-webpack-plugin';
+import FaviconPlugin from 'favicons-webpack-plugin';
 import * as env from '../../src/common/utils/env';
 import { getEnv } from '../../src/server/utils/get-env';
 
@@ -101,6 +102,13 @@ const config: Configuration = {
             APP_ENV: 'development',
             NODE_ENV: env.isProd ? 'production' : 'development',
             LOG_LEVEL: 'warn',
+        }),
+        new FaviconPlugin({
+            cache: false,
+            logo: path.resolve('src/client/assets/images/favicon.png'),
+            outputPath: './static/icons',
+            prefix: 'icons/',
+            publicPath: '/static',
         }),
     ],
     devServer: {
