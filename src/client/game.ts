@@ -1,6 +1,7 @@
 import phaser from 'phaser';
 import { bind } from 'bind-decorator';
 import { debounce } from 'lodash';
+import { isMobile } from 'is-mobile';
 import { ConfigProvider } from './game-config/config-provider';
 import { HttpClient } from './api/http-client';
 import { GameState } from './state/game-state';
@@ -86,8 +87,7 @@ export class ServerlessGame<S extends typeof BaseScene> {
             };
         }
 
-        const dpr = window.devicePixelRatio || 1;
-        const zoom = dpr / 3;
+        const zoom = isMobile() ? 1.4 : 0.6;
         const parentWidth = Math.ceil(this.parentEl.clientWidth / zoom);
         const parentHeight = Math.ceil(this.parentEl.clientHeight / zoom);
 
