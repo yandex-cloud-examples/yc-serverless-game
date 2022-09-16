@@ -5,6 +5,7 @@ import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
 import { HeaderInfoManager } from '../managers/header-info-manager';
 import { BaseScene } from './base';
+import { GameStateUpdater } from '../state/game-state-updater';
 
 export class MainScene extends BaseScene {
     create() {
@@ -14,11 +15,14 @@ export class MainScene extends BaseScene {
         const gridStateManager = new GridStateManager(this.gameState, grid);
         const gridMoveManager = new GridMoveManager(grid, me, this.apiClient, this.gameState);
         const scoreManager = new HeaderInfoManager(this.gameState, this, '#header');
-        const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
+        // const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState);
+        // TODO: get rid of ignore
+        // @ts-ignore
+        const gameStateUpdate = new GameStateUpdater(this.apiClient, this.gameState);
 
         this.cameras.main.startFollow(me);
         this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
 
-        gameStatePoller.start();
+        // gameStatePoller.start();
     }
 }

@@ -6,6 +6,7 @@ import { withDb } from '../../db/with-db';
 import { User } from '../../db/entity/user';
 import { logger } from '../../../common/logger';
 import { executeQuery } from '../../db/execute-query';
+import { notifyStateChange } from '../../utils/notify-state-change';
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
     const captureGridCellQuery = `
@@ -49,6 +50,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
             }
         }
     }
+
+    await notifyStateChange();
 
     return functionResponse({});
 });

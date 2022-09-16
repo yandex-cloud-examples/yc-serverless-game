@@ -59,7 +59,8 @@ functions:
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
       YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
-      YMQ_QUEUE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_queue_url}
+      YMQ_CAPTURE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_capture_queue_url}
+      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
 
   capture:
     handler: dist/server/capture.handler
@@ -82,6 +83,31 @@ functions:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
+      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
+      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
+
+  state-change:
+    handler: dist/server/state-change.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    events:
+      - ymq:
+          account: triggers-sa
+          queueAccount: ymq-reader-sa
+          queue: notify-state-change
+          batch: 10
+          cutoff: 1
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/state-change.js
+    environment:
+      LOG_LEVEL: debug
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
   login:
     handler: dist/server/login.handler
@@ -98,6 +124,9 @@ functions:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
+      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
+      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
+      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
 
 
   auth:
@@ -130,6 +159,25 @@ functions:
       LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+
+  ws-message:
+    handler: dist/server/ws-message.handler
+    memorySize: 128
+    timeout: 5
+    account: functions-sa
+    package:
+      patterns:
+        - '!**'
+        - dist/server/certs/*
+        - dist/server/ws-message.js
+    environment:
+      LOG_LEVEL: debug
+      YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
+      YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
+      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
+      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
+      YMQ_CAPTURE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_capture_queue_url}
+      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
 
   ws-disconnect:
     handler: dist/server/ws-disconnect.handler
@@ -167,5 +215,7 @@ resources:
   serverless-game-files:
     type: yc::ObjectStorageBucket
   capturing-queue:
+    type: yc::MessageQueue
+  notify-state-change:
     type: yc::MessageQueue
 

@@ -111,4 +111,10 @@ export class User extends Entity {
 
         return this.fromResultSet(resultSets[0]);
     }
+
+    static async allWithWsConnection(dbSess: Session): Promise<User[]> {
+        const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM Users WHERE ws_connection_id IS NOT NULL');
+
+        return this.fromResultSet(resultSets[0]);
+    }
 }

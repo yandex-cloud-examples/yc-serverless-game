@@ -1,5 +1,4 @@
 import { Session, TypedValues } from 'ydb-sdk';
-import { SQS } from '@aws-sdk/client-sqs';
 
 import { User } from '../../db/entity/user';
 import { GridCell } from '../../db/entity/grid-cell';
@@ -10,20 +9,10 @@ import { MoveRequest } from './types';
 import { getGameConfig } from '../../utils/get-game-config';
 import { ValidationError } from './validation-error';
 import { isPlayerActive } from '../../utils/is-player-active';
+import { sqsClient } from '../../utils/sqs-client';
 
-const YMQ_WRITER_ACCESS_KEY_ID = getEnv('YMQ_WRITER_ACCESS_KEY_ID');
-const YMQ_WRITER_SECRET_ACCESS_KEY = getEnv('YMQ_WRITER_SECRET_ACCESS_KEY');
-const YMQ_QUEUE_URL = getEnv('YMQ_QUEUE_URL');
+const YMQ_QUEUE_URL = getEnv('YMQ_CAPTURE_URL');
 const MAX_MOVE_DISTANCE = 2;
-
-const sqsClient = new SQS({
-    region: 'ru-central1',
-    endpoint: 'https://message-queue.api.cloud.yandex.net',
-    credentials: {
-        accessKeyId: YMQ_WRITER_ACCESS_KEY_ID,
-        secretAccessKey: YMQ_WRITER_SECRET_ACCESS_KEY,
-    },
-});
 
 export const canBeCaptured = async (dbSess: Session, player: User): Promise<boolean> => {
     const cellQuery = `

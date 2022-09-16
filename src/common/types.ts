@@ -36,6 +36,7 @@ export interface ServerState {
     me: PlayerState;
     players: PlayerState[];
     stats: Stats;
+    time: number;
 }
 
 export interface CapturingMessage {

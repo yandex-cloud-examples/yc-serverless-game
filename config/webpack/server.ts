@@ -13,7 +13,9 @@ const config: Configuration = {
         'get-config': path.resolve('src/server/functions/get-config/index.ts'),
         move: path.resolve('src/server/functions/move/index.ts'),
         capture: path.resolve('src/server/functions/capture/index.ts'),
+        'state-change': path.resolve('src/server/functions/state-change/index.ts'),
         'ws-connect': path.resolve('src/server/functions/ws-connect/index.ts'),
+        'ws-message': path.resolve('src/server/functions/ws-message/index.ts'),
         'ws-disconnect': path.resolve('src/server/functions/ws-disconnect/index.ts'),
     },
     resolve: {

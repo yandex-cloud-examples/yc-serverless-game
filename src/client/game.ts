@@ -43,7 +43,7 @@ export class ServerlessGame<S extends typeof BaseScene> {
 
         ConfigProvider.init(gameConfig);
 
-        const mainScene = new this.SceneClass(gameState, this.httpApiClient);
+        const mainScene = new this.SceneClass(gameState, this.wsApiClient);
 
         this.game = new phaser.Game({
             type: phaser.AUTO,

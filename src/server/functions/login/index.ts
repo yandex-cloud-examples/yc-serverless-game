@@ -11,6 +11,7 @@ import { UserState } from '../../../common/types';
 import { getGameConfig } from '../../utils/get-game-config';
 import { executeQuery } from '../../db/execute-query';
 import { isPlayerActive } from '../../utils/is-player-active';
+import { notifyStateChange } from '../../utils/notify-state-change';
 
 const TG_CDN_PREFIX = 'https://t.me/i/userpic';
 
@@ -127,6 +128,8 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $imageType: user.getTypedValue('imageType'),
         });
     }
+
+    await notifyStateChange();
 
     const autCookie = cookie.serialize(AUTH_COOKIE_NAME, JSON.stringify(authParameters), {
         path: '/',
