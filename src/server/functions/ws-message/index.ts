@@ -61,12 +61,15 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
         });
 
         await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
-        await notifyStateChange();
+        await notifyStateChange('ws-move');
 
         const stateBuilder = await ServerStateBuilder.create(dbSess);
         const response: StateUpdateMessage = {
             type: 'state-update',
             payload: stateBuilder.buildState(meId),
+            meta: {
+                updateSources: ['ws-move-response'],
+            },
         };
 
         return functionResponse(response);

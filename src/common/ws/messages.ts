@@ -1,8 +1,9 @@
 import { ServerState } from '../types';
 
-interface GenericMessage<T extends string, P> {
+interface GenericMessage<T extends string, P, M = unknown> {
     type: T;
     payload: P;
+    meta?: M;
 }
 
 interface MoveRequestPayload {
@@ -11,7 +12,7 @@ interface MoveRequestPayload {
 }
 
 export type MoveRequestMessage = GenericMessage<'move-request', MoveRequestPayload>;
-export type StateUpdateMessage = GenericMessage<'state-update', ServerState>;
+export type StateUpdateMessage = GenericMessage<'state-update', ServerState, { updateSources: string[] }>;
 
 export type ServerMessage = StateUpdateMessage;
 export type ClientMessage = MoveRequestMessage;

@@ -129,7 +129,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         });
     }
 
-    await notifyStateChange();
+    await notifyStateChange('login');
 
     const autCookie = cookie.serialize(AUTH_COOKIE_NAME, JSON.stringify(authParameters), {
         path: '/',

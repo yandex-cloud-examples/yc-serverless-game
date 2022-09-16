@@ -59,7 +59,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         $state: me.getTypedValue('state'),
     });
 
-    await notifyStateChange();
+    await notifyStateChange('move');
 
     await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
 

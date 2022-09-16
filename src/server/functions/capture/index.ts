@@ -51,7 +51,7 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
         }
     }
 
-    await notifyStateChange();
+    await notifyStateChange('capture');
 
     return functionResponse({});
 });

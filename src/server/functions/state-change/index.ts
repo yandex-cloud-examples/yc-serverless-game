@@ -7,6 +7,7 @@ import { ServerStateBuilder } from '../../utils/server-state-builder';
 import { logger } from '../../../common/logger';
 import { ServerState } from '../../../common/types';
 import { StateUpdateMessage } from '../../../common/ws/messages';
+import { safeJsonParse } from '../../utils/safe-json-parse';
 
 const { serverless: { apigateway_connection_service: connectionService } } = cloudApi;
 
@@ -15,6 +16,11 @@ const wsClient = cloudApiSession.client(serviceClients.WebSocketConnectionServic
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
     const usersToNotify = await User.allWithWsConnection(dbSess);
+    const updateSources = event.messages.map((m) => {
+        const body = safeJsonParse<{ updateSource: string }>(m.details.message.body);
+
+        return body ? body.updateSource : '';
+    });
 
     if (usersToNotify.length > 0) {
         const stateBuilder = await ServerStateBuilder.create(dbSess);
@@ -25,6 +31,7 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
             const message: StateUpdateMessage = {
                 type: 'state-update',
                 payload: serverState,
+                meta: { updateSources },
             };
             const request = connectionService.SendToConnectionRequest.fromPartial({
                 connectionId: user.wsConnectionId,
