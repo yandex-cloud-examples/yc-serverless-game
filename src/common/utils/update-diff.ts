@@ -8,7 +8,5 @@ export const updateDiff = <T>(target: T, source: T) => {
         for (const diffItem of diff) {
             deepDiff.applyChange(target, source, diffItem);
         }
-    } else {
-        logger.debug('There is no diff in target and source');
     }
 };

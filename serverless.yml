@@ -24,7 +24,6 @@ functions:
         - dist/server/certs/*
         - dist/server/get-state.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -39,7 +38,6 @@ functions:
         - dist/server/certs/*
         - dist/server/get-config.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -54,7 +52,6 @@ functions:
         - dist/server/certs/*
         - dist/server/move.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
@@ -64,7 +61,7 @@ functions:
 
   capture:
     handler: dist/server/capture.handler
-    memorySize: 128
+    memorySize: 2048
     timeout: 5
     account: functions-sa
     events:
@@ -80,7 +77,6 @@ functions:
         - dist/server/certs/*
         - dist/server/capture.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
@@ -89,7 +85,7 @@ functions:
 
   state-change:
     handler: dist/server/state-change.handler
-    memorySize: 128
+    memorySize: 2048
     timeout: 5
     account: functions-sa
     events:
@@ -105,7 +101,6 @@ functions:
         - dist/server/certs/*
         - dist/server/state-change.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
@@ -120,7 +115,6 @@ functions:
         - dist/server/certs/*
         - dist/server/login.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
@@ -140,7 +134,6 @@ functions:
         - dist/server/certs/*
         - dist/server/auth.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
@@ -156,13 +149,12 @@ functions:
         - dist/server/certs/*
         - dist/server/ws-connect.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 
   ws-message:
     handler: dist/server/ws-message.handler
-    memorySize: 128
+    memorySize: 2048
     timeout: 5
     account: functions-sa
     package:
@@ -171,7 +163,6 @@ functions:
         - dist/server/certs/*
         - dist/server/ws-message.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
@@ -190,7 +181,6 @@ functions:
         - dist/server/certs/*
         - dist/server/ws-disconnect.js
     environment:
-      LOG_LEVEL: debug
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
 

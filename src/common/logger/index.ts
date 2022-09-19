@@ -1,7 +1,9 @@
-import log from 'loglevel';
+import Logger from 'js-logger';
 
-export const logger = log.getLogger('default');
+const level = process.env.DEBUG ? Logger.TRACE : Logger.WARN;
 
-const level = (process.env.LOG_LEVEL || 'warn') as log.LogLevelDesc;
+Logger.useDefaults();
+Logger.setLevel(level);
 
-logger.setLevel(level);
+export const logger = Logger.get('global');
+export const createLogger = Logger.get;

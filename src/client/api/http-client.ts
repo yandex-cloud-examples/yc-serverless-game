@@ -4,13 +4,14 @@ import axios, {
 import axiosRetry from 'axios-retry';
 import { Mutex } from 'async-mutex';
 import { GameConfig, ServerState } from '../../common/types';
-import { logger } from '../../common/logger';
+import { createLogger } from '../../common/logger';
 import { ApiClient } from './index';
 
 const DEFAULT_RETRY_COUNT = 2;
 const DEFAULT_REQUEST_TIMEOUT_MS = 2000;
 const DEFAULT_BASE_URL = '/api/';
 const IDEMPOTENT_HTTP_METHODS = new Set(['put', 'delete', 'get', 'head', 'options']);
+const logger = createLogger('HttpClient');
 
 const isTimoutError = (error: AxiosError): boolean => {
     return error.code === 'ECONNABORTED';

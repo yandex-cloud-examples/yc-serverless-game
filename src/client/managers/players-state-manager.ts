@@ -4,7 +4,6 @@ import { bind } from 'bind-decorator';
 
 import { Player } from '../objects/player';
 import { GameState } from '../state/game-state';
-import { AssetKeys } from '../assets';
 import { GridCoords } from '../objects/grid/grid-coords';
 import { UserState } from '../../common/types';
 

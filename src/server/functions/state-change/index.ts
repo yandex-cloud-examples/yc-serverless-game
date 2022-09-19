@@ -11,9 +11,6 @@ import { safeJsonParse } from '../../utils/safe-json-parse';
 
 const { serverless: { apigateway_connection_service: connectionService } } = cloudApi;
 
-const cloudApiSession = new Session();
-const wsClient = cloudApiSession.client(serviceClients.WebSocketConnectionServiceClient);
-
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
     const usersToNotify = await User.allWithWsConnection(dbSess);
     const updateSources = event.messages.map((m) => {
@@ -23,6 +20,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
     });
 
     if (usersToNotify.length > 0) {
+        const cloudApiSession = new Session();
+        const wsClient = cloudApiSession.client(serviceClients.WebSocketConnectionServiceClient);
         const stateBuilder = await ServerStateBuilder.create(dbSess);
 
         // Each player should receive personal state

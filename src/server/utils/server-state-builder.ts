@@ -7,12 +7,16 @@ import { getGameConfig } from './get-game-config';
 import { isPlayerActive } from './is-player-active';
 
 export class ServerStateBuilder {
+    private readonly createdTime: number;
+
     private constructor(
         private dbSess: Session,
         private config: GameConfig,
         private users: User[],
         private gridCells: GridCell[],
-    ) {}
+    ) {
+        this.createdTime = Date.now();
+    }
 
     static async create(dbSess: Session) {
         const users = await User.all(dbSess);
@@ -97,7 +101,7 @@ export class ServerStateBuilder {
             grid: this.buildGrid(),
             me: this.buildMe(meId),
             stats: withStats ? this.buildStats() : {},
-            time: Date.now(),
+            time: this.createdTime,
         };
     }
 }

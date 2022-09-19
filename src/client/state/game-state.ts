@@ -4,6 +4,9 @@ import {
 
 import { ServerState, UserState } from '../../common/types';
 import { updateDiff } from '../../common/utils/update-diff';
+import { createLogger } from '../../common/logger';
+
+const logger = createLogger('GameState');
 
 export class GameState {
     @observable me: ServerState['me'];
@@ -27,6 +30,8 @@ export class GameState {
 
     @action
     update(newState: ServerState) {
+        logger.debug('Received request to update state', newState);
+
         updateDiff(this.me, newState.me);
         updateDiff(this.grid, newState.grid);
         updateDiff(this.players, newState.players);
@@ -35,6 +40,8 @@ export class GameState {
 
     @action
     moveMeTo(gridX: number, gridY: number): boolean {
+        logger.debug('Called moveMeTo', [gridX, gridY]);
+
         const isCellFree = !this.players.some((p) => p.gridX === gridX && p.gridY === gridY);
 
         // do not allow to move to cell where another player is located

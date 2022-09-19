@@ -2,7 +2,7 @@ import { Handler } from '@yandex-cloud/function-types';
 
 import { functionResponse } from '../../utils/function-response';
 import { withDb } from '../../db/with-db';
-import { ClientMessage, StateUpdateMessage } from '../../../common/ws/messages';
+import { ClientMessage, MoveResponseMessage } from '../../../common/ws/messages';
 import { User } from '../../db/entity/user';
 import { tryCapture, validateMoveRequest } from '../move/helpers';
 import { ValidationError } from '../move/validation-error';
@@ -10,9 +10,9 @@ import { UserState } from '../../../common/types';
 import { executeQuery } from '../../db/execute-query';
 import { CAPTURING_DEFAULT_DURATION_S } from '../../utils/constants';
 import { notifyStateChange } from '../../utils/notify-state-change';
-import { ServerStateBuilder } from '../../utils/server-state-builder';
 import { updateLastActive } from '../../utils/update-last-active';
 import { probablyCall } from '../../utils/probably-call';
+import { ServerStateBuilder } from '../../utils/server-state-builder';
 
 export const handler = withDb<Handler.Http>(async (dbSess, event) => {
     const meId = event.requestContext.authorizer?.userId;
@@ -64,12 +64,9 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
         await notifyStateChange('ws-move');
 
         const stateBuilder = await ServerStateBuilder.create(dbSess);
-        const response: StateUpdateMessage = {
-            type: 'state-update',
+        const response: MoveResponseMessage = {
+            type: 'move-response',
             payload: stateBuilder.buildState(meId),
-            meta: {
-                updateSources: ['ws-move-response'],
-            },
         };
 
         return functionResponse(response);

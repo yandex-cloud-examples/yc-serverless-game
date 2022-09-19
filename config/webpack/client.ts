@@ -103,7 +103,7 @@ const config: Configuration = {
         new EnvironmentPlugin({
             APP_ENV: 'development',
             NODE_ENV: env.isProd ? 'production' : 'development',
-            LOG_LEVEL: 'warn',
+            DEBUG: '',
         }),
         new FaviconPlugin({
             cache: false,

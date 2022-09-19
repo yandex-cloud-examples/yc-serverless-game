@@ -13,6 +13,7 @@ interface MoveRequestPayload {
 
 export type MoveRequestMessage = GenericMessage<'move-request', MoveRequestPayload>;
 export type StateUpdateMessage = GenericMessage<'state-update', ServerState, { updateSources: string[] }>;
+export type MoveResponseMessage = GenericMessage<'move-response', ServerState>;
 
-export type ServerMessage = StateUpdateMessage;
+export type ServerMessage = StateUpdateMessage | MoveResponseMessage;
 export type ClientMessage = MoveRequestMessage;
