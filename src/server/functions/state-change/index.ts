@@ -1,5 +1,4 @@
 import { Handler } from '@yandex-cloud/function-types';
-import { cloudApi, serviceClients, Session } from '@yandex-cloud/nodejs-sdk';
 import { functionResponse } from '../../utils/function-response';
 import { withDb } from '../../db/with-db';
 import { User } from '../../db/entity/user';
@@ -7,9 +6,8 @@ import { ServerStateBuilder } from '../../utils/server-state-builder';
 import { logger } from '../../../common/logger';
 import { ServerState } from '../../../common/types';
 import { StateUpdateMessage } from '../../../common/ws/messages';
-import { safeJsonParse } from '../../utils/safe-json-parse';
-
-const { serverless: { apigateway_connection_service: connectionService } } = cloudApi;
+import { safeJsonParse } from '../../../common/utils/safe-json-parse';
+import { sendCompressedMessage } from '../../utils/ws';
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
     const usersToNotify = await User.allWithWsConnection(dbSess);
@@ -20,8 +18,6 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
     });
 
     if (usersToNotify.length > 0) {
-        const cloudApiSession = new Session();
-        const wsClient = cloudApiSession.client(serviceClients.WebSocketConnectionServiceClient);
         const stateBuilder = await ServerStateBuilder.create(dbSess);
 
         // Each player should receive personal state
@@ -32,14 +28,11 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
                 payload: serverState,
                 meta: { updateSources },
             };
-            const request = connectionService.SendToConnectionRequest.fromPartial({
-                connectionId: user.wsConnectionId,
-                type: connectionService.SendToConnectionRequest_DataType.TEXT,
-                data: Buffer.from(JSON.stringify(message), 'utf8'),
-            });
 
             try {
-                await wsClient.send(request);
+                // Absolutely sure wsConnectionId is not empty since queried from DB only users with connectionId
+                // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+                await sendCompressedMessage(user.wsConnectionId!, message);
             } catch {
                 logger.warn(`Unable to send message to connection: ${user.wsConnectionId}`);
             }

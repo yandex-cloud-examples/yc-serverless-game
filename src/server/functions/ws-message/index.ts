@@ -13,10 +13,16 @@ import { notifyStateChange } from '../../utils/notify-state-change';
 import { updateLastActive } from '../../utils/update-last-active';
 import { probablyCall } from '../../utils/probably-call';
 import { ServerStateBuilder } from '../../utils/server-state-builder';
+import { compressMessage, decompressMessage } from '../../utils/ws';
+import { safeJsonParse } from '../../../common/utils/safe-json-parse';
 
 export const handler = withDb<Handler.Http>(async (dbSess, event) => {
     const meId = event.requestContext.authorizer?.userId;
-    const message: ClientMessage = JSON.parse(event.body);
+    const message = event.isBase64Encoded ? decompressMessage(event.body) : safeJsonParse<ClientMessage>(event.body);
+
+    if (!message) {
+        throw new Error(`Unable to parse incoming message: ${JSON.stringify(message)}`);
+    }
 
     if (message.type === 'move-request') {
         const moveRequest = message.payload;
@@ -64,12 +70,16 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
         await notifyStateChange('ws-move');
 
         const stateBuilder = await ServerStateBuilder.create(dbSess);
-        const response: MoveResponseMessage = {
+        const responseMessage: MoveResponseMessage = {
             type: 'move-response',
             payload: stateBuilder.buildState(meId),
         };
 
-        return functionResponse(response);
+        return {
+            statusCode: 200,
+            body: compressMessage(responseMessage).toString('base64'),
+            isBase64Encoded: true,
+        };
     }
 
     return functionResponse({});

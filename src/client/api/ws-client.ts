@@ -1,13 +1,17 @@
 import {
-    WebsocketBuilder, Websocket, LinearBackoff, LRUBuffer,
+    LinearBackoff, LRUBuffer, Websocket, WebsocketBuilder,
 } from 'websocket-ts';
 import { Mutex } from 'async-mutex';
 import { bind } from 'bind-decorator';
 import { ApiClient } from './index';
 import { HttpClient } from './http-client';
 import { ServerState } from '../../common/types';
-import { MoveRequestMessage, MoveResponseMessage, ServerMessage } from '../../common/ws/messages';
+import {
+    MoveRequestMessage, MoveResponseMessage,
+} from '../../common/ws/messages';
 import { createLogger } from '../../common/logger';
+import { Channel } from './channel';
+import { compressMessage, decompressMessage } from './compression';
 
 const DEFAULT_URL = '/websocket';
 const DEFAULT_WS_BACKOFF = new LinearBackoff(0, 1000, 5000);
@@ -15,47 +19,6 @@ const DEFAULT_WS_BUFFER = new LRUBuffer(5);
 const logger = createLogger('WsClient');
 
 type ServerStateListener = (newState: ServerState) => void;
-
-class Channel<T> {
-    private promise!: Promise<T>;
-    private resolveFn!: (value: T) => void;
-    private rejectFn!: () => void;
-
-    private static DEFAULT_TIMEOUT_MS = 2000;
-
-    constructor() {
-        this.recreatePromise();
-    }
-
-    private recreatePromise() {
-        this.promise = new Promise<T>((resolve, reject) => {
-            this.resolveFn = resolve;
-            this.rejectFn = reject;
-        });
-    }
-
-    send(value: T) {
-        this.resolveFn(value);
-
-        this.recreatePromise();
-    }
-
-    async receive(timeoutMs = Channel.DEFAULT_TIMEOUT_MS): Promise<T> {
-        return new Promise<T>((resolve, reject) => {
-            const timeout = setTimeout(() => {
-                reject(new Error(`Timeout ${timeoutMs}ms reached`));
-            }, timeoutMs);
-
-            this.promise
-                .then((value) => {
-                    clearTimeout(timeout);
-
-                    resolve(value);
-                })
-                .catch(reject);
-        });
-    }
-}
 
 export class WsClient implements ApiClient {
     private readonly ws: Websocket;
@@ -103,10 +66,22 @@ export class WsClient implements ApiClient {
     }
 
     @bind
-    private onMessage(ws: Websocket, event: MessageEvent) {
-        const message: ServerMessage = JSON.parse(event.data);
+    private async onMessage(ws: Websocket, event: MessageEvent) {
+        if (!(event.data instanceof Blob)) {
+            logger.warn('Incoming data is not Blob', event);
+
+            return;
+        }
+
+        const message = await decompressMessage(event.data);
 
         logger.debug('Got message from websocket', message);
+
+        if (!message) {
+            logger.warn('WS message is empty after decompressing');
+
+            return;
+        }
 
         switch (message.type) {
             case 'state-update':
@@ -140,7 +115,9 @@ export class WsClient implements ApiClient {
                 },
             };
 
-            this.ws.send(JSON.stringify(message));
+            const compressedMessage = await compressMessage(message);
+
+            this.ws.send(compressedMessage);
 
             try {
                 logger.debug('Waiting for move response', moveRequest);

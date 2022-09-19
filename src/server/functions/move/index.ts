@@ -3,7 +3,7 @@ import { withDb } from '../../db/with-db';
 
 import { functionResponse } from '../../utils/function-response';
 import { User } from '../../db/entity/user';
-import { safeJsonParse } from '../../utils/safe-json-parse';
+import { safeJsonParse } from '../../../common/utils/safe-json-parse';
 import { tryCapture, validateMoveRequest } from './helpers';
 import { UserState } from '../../../common/types';
 import { CAPTURING_DEFAULT_DURATION_S } from '../../utils/constants';
