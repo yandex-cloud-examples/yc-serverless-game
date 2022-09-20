@@ -34,6 +34,7 @@ export class MainScene extends BaseScene {
         const headerManager = new HeaderInfoManager(this.gameState, this, '#header');
 
         this.cameras.main.startFollow(me);
+        this.cameras.main.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
         this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
     }
 }
