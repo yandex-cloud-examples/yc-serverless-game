@@ -44,7 +44,7 @@ export class ServerlessGame<S extends typeof BaseScene> {
 
         ConfigProvider.init(gameConfig);
 
-        const mainScene = new this.SceneClass(gameState, this.wsApiClient);
+        const mainScene = new this.SceneClass(gameState, this.httpApiClient, this.wsApiClient);
 
         this.game = new phaser.Game({
             type: phaser.AUTO,
@@ -87,7 +87,7 @@ export class ServerlessGame<S extends typeof BaseScene> {
             };
         }
 
-        const zoom = isMobile() ? 1.4 : 0.6;
+        const zoom = isMobile() ? 1.2 : 0.6;
         const parentWidth = Math.ceil(this.parentEl.clientWidth / zoom);
         const parentHeight = Math.ceil(this.parentEl.clientHeight / zoom);
 

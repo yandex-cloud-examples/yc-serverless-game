@@ -6,7 +6,7 @@ import { createLogger } from '../../common/logger';
 
 const logger = createLogger('GameStateUpdate');
 
-export class GameStateUpdater {
+export class GameStateUpdaterWs {
     constructor(
         private readonly wsClient: WsClient,
         private readonly gameState: GameState,

@@ -1,5 +1,5 @@
 import { Grid } from '../objects/grid/grid';
-import { GameStatePoller } from '../state/game-state-poller';
+import { GameStateUpdaterHttp } from '../state/game-state-updater-http';
 import { PlayersStateManager } from '../managers/players-state-manager';
 import { GridStateManager } from '../managers/grid-state-manager';
 import { BaseScene } from './base';
@@ -10,7 +10,7 @@ export class StatsScene extends BaseScene {
         const grid = new Grid(this);
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const gridStateManager = new GridStateManager(this.gameState, grid);
-        const gameStatePoller = new GameStatePoller(this.apiClient, this.gameState, undefined, true);
+        const gameStatePoller = new GameStateUpdaterHttp(this.httpClient, this.gameState, undefined, true);
         const gameStatsManager = new GameStatsManager(this.gameState, '#stats-body');
 
         this.cameras.main.setZoom(this.calculateZoom());

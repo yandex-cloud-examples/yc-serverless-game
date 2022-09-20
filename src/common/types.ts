@@ -4,6 +4,7 @@ export interface GameConfig {
     playerSize: number;
     maxInactiveSec: number;
     maxActivePlayers: number;
+    transport: NetworkTransport;
 }
 
 export interface GridCellState {
@@ -44,3 +45,5 @@ export interface CapturingMessage {
     gridX: number;
     gridY: number;
 }
+
+export type NetworkTransport = 'http' | 'ws';

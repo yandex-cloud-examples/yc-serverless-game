@@ -4,6 +4,7 @@ import { ConfigProvider } from '../game-config/config-provider';
 import { GridCoords } from '../objects/grid/grid-coords';
 import { GameState } from '../state/game-state';
 import { ApiClient } from '../api';
+import { WsClient } from '../api/ws-client';
 
 const PLAYER_SPRITE_FRAME_CONFIG: phaser.Types.Loader.FileTypes.ImageFrameConfig = {
     frameWidth: 81,
@@ -12,14 +13,12 @@ const PLAYER_SPRITE_FRAME_CONFIG: phaser.Types.Loader.FileTypes.ImageFrameConfig
 
 // TODO: set background
 export class BaseScene extends phaser.Scene {
-    protected gameState: GameState;
-    protected apiClient: ApiClient;
-
-    constructor(gameState: GameState, apiClient: ApiClient) {
+    constructor(
+        protected gameState: GameState,
+        protected httpClient: ApiClient,
+        protected wsClient: WsClient,
+    ) {
         super('main');
-
-        this.gameState = gameState;
-        this.apiClient = apiClient;
     }
 
     protected get worldSize() {

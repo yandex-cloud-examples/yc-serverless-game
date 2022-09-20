@@ -25,5 +25,6 @@ export const getGameConfig = async (dbSess: Session, name = 'default'): Promise<
         worldGridSize: [config.worldSizeX, config.worldSizeY],
         maxInactiveSec: config.maxInactiveSec,
         maxActivePlayers: config.maxActivePlayers,
+        transport: config.transport,
     };
 };

@@ -2,6 +2,7 @@ import {
     withTypeOptions, snakeToCamelCaseConversion, declareType, Types,
 } from 'ydb-sdk';
 import { Entity } from './entity';
+import { NetworkTransport } from '../../../common/types';
 
 interface IConfigData {
     name: string;
@@ -11,6 +12,7 @@ interface IConfigData {
     worldSizeY: number;
     maxInactiveSec: number;
     maxActivePlayers: number;
+    transport: NetworkTransport;
 }
 
 @withTypeOptions({ namesConversion: snakeToCamelCaseConversion })
@@ -36,6 +38,9 @@ export class Config extends Entity {
     @declareType(Types.UINT8)
     public maxActivePlayers: number;
 
+    @declareType(Types.UTF8)
+    public transport: NetworkTransport;
+
     constructor(data: IConfigData) {
         super(data);
 
@@ -46,5 +51,6 @@ export class Config extends Entity {
         this.gridCellSize = data.gridCellSize;
         this.maxInactiveSec = data.maxInactiveSec;
         this.maxActivePlayers = data.maxActivePlayers;
+        this.transport = data.transport;
     }
 }

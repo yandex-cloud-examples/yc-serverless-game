@@ -20,8 +20,8 @@ const delayPromise = (delayMs: number): Promise<void> => {
     });
 };
 
-export class GameStatePoller {
-    private state: PollingState = PollingState.STOPPED;
+export class GameStateUpdaterHttp {
+    private state: PollingState = PollingState.POLLING;
     private pollingErrorsCount = 0;
     private pollingInitialized = false;
 
