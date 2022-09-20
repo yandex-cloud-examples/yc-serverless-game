@@ -50,7 +50,10 @@ export class GameStatsManager {
     @bind
     updatePlayersStats() {
         const topPlayers = this.gameState.stats.topPlayers;
+        const online = this.gameState.players.length + 1;
         const playerTopItems: VNode[] = [];
+
+        const onlineBlock = html`<div id="stats-online">Онлайн: ${online}</div>`;
 
         if (topPlayers) {
             for (const [i, player] of topPlayers.entries()) {
@@ -67,6 +70,6 @@ export class GameStatsManager {
             }
         }
 
-        render(playerTopItems, this.containerElement);
+        render([onlineBlock, playerTopItems], this.containerElement);
     }
 }
