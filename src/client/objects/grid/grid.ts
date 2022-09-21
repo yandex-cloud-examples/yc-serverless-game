@@ -2,6 +2,7 @@ import * as phaser from 'phaser';
 import { AssetKeys } from '../../assets';
 import { ConfigProvider } from '../../game-config/config-provider';
 import { GridCell } from './grid-cell';
+import { GridCoords } from './grid-coords';
 
 type AbstractCallback = (...args: any[]) => void;
 
@@ -19,6 +20,7 @@ export class Grid {
 
     constructor(scene: phaser.Scene) {
         this.gridSize = ConfigProvider.getConfig().worldGridSize;
+        const coords = GridCoords.getBoundsFromGridPos(this.gridSize[0], this.gridSize[1]);
 
         for (let gridX = 0; gridX < this.gridSize[0]; gridX++) {
             let yMap = this.grid.get(gridX);
@@ -38,6 +40,11 @@ export class Grid {
                 yMap.set(gridY, cell);
             }
         }
+
+        scene.add.rectangle(3, 3, coords[0] - 6, coords[1] - 6)
+            .setOrigin(0, 0)
+            .setStrokeStyle(7, 0xFF_FF_FF)
+            .setAlpha(0.6);
 
         scene.input.on(phaser.Input.Events.GAMEOBJECT_UP, (_: unknown, object: unknown) => {
             if (object instanceof GridCell) {

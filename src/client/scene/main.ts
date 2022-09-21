@@ -9,6 +9,8 @@ import { GameStateUpdaterWs } from '../state/game-state-updater-ws';
 import { ConfigProvider } from '../game-config/config-provider';
 import { ApiClient } from '../api';
 
+const CAMERA_BOUNDS_DELTA = 100;
+
 export class MainScene extends BaseScene {
     create() {
         const gameConfig = ConfigProvider.getConfig();
@@ -34,7 +36,12 @@ export class MainScene extends BaseScene {
         const headerManager = new HeaderInfoManager(this.gameState, this, '#header');
 
         this.cameras.main.startFollow(me);
-        this.cameras.main.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
+        this.cameras.main.setBounds(
+            -1 * CAMERA_BOUNDS_DELTA,
+            -1 * CAMERA_BOUNDS_DELTA,
+            this.worldSize[0] + 2 * CAMERA_BOUNDS_DELTA,
+            this.worldSize[1] + 2 * CAMERA_BOUNDS_DELTA,
+        );
         this.physics.world.setBounds(0, 0, this.worldSize[0], this.worldSize[1]);
     }
 }
