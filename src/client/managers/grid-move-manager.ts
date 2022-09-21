@@ -39,9 +39,19 @@ export class GridMoveManager {
         const playerGridCell = this.grid.getCell(playerPos[0], playerPos[1]);
         const clickedCell = this.grid.getCell(gridPos[0], gridPos[1]);
 
+        if (this.selectedCell) {
+            this.selectedCell.resetState();
+        }
+
         if (playerGridCell.isAdjacent(clickedCell) && this.gameState.moveMeTo(gridPos[0], gridPos[1])) {
+            this.selectedCell = clickedCell;
+            this.selectedCell.setSelected();
+
             // do not wait for promise resolution intentionally
             await this.apiClient.moveTo(gridPos[0], gridPos[1]);
+
+            this.selectedCell.resetState();
+            this.selectedCell = null;
         }
 
         clearTimeout(timeout);
