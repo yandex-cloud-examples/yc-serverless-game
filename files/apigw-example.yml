@@ -1,0 +1,126 @@
+openapi: 3.0.0
+info:
+  title: Sample API
+  version: 1.0.0
+paths:
+  /:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: serverless-game-files
+        object: index.html
+        service_account_id: <sa-id>
+      security: []
+  /login.html:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: serverless-game-files
+        object: login.html
+        service_account_id: <sa-id>
+      security: []
+  /stats.html:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: serverless-game-files
+        object: stats.html
+        service_account_id: <sa-id>
+      security: []
+  /limit.html:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: serverless-game-files
+        object: limit.html
+        service_account_id: <sa-id>
+      security: []
+  /static/{file+}:
+    get:
+      x-yc-apigateway-integration:
+        type: object_storage
+        bucket: serverless-game-files
+        object: static/{file}
+        service_account_id: <sa-id>
+      parameters:
+        - explode: false
+          in: path
+          name: file
+          required: true
+          schema:
+            type: string
+          style: simple
+      security: []
+  /api/get-state:
+    get:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        tag: $latest
+        service_account_id: <sa-id>
+  /api/get-config:
+    get:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        tag: $latest
+        service_account_id: <sa-id>
+  /api/move:
+    post:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        tag: $latest
+        service_account_id: <sa-id>
+  /api/login:
+    get:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        tag: $latest
+        service_account_id: <sa-id>
+      security: []
+  /proxy/tg-avatars/{filePath+}:
+    get:
+      x-yc-apigateway-integration:
+        type: http
+        url: https://t.me/i/userpic/{filePath}
+        method: GET
+      parameters:
+        - explode: false
+          in: path
+          name: filePath
+          required: true
+          schema:
+            type: string
+          style: simple
+  /websocket:
+    x-yc-apigateway-websocket-message:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        service_account_id: <sa-id>
+    x-yc-apigateway-websocket-connect:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        service_account_id: <sa-id>
+    x-yc-apigateway-websocket-disconnect:
+      x-yc-apigateway-integration:
+        type: cloud_functions
+        function_id: <function_id>
+        service_account_id: <sa-id>
+components:
+  securitySchemes:
+    cooikeAuth:
+      x-yc-apigateway-authorizer:
+        type: function
+        function_id: <function_id>
+        tag: $latest
+        service_account_id: <sa-id>
+        authorizer_result_ttl_in_seconds: 180
+      in: cookie
+      name: AUTH
+      type: apiKey
+security:
+  - cooikeAuth: []
