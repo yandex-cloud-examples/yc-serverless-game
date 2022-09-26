@@ -4,7 +4,6 @@
 2. `npm ci`
 3. `npm start`
 
-
 ## Deployment
 1. Required environment variables:
    1. `AWS_ACCESS_KEY_ID` - id of SA which will be used for creating/updating resources in cloud 
