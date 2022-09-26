@@ -29,6 +29,7 @@ export class GridCell extends Entity {
         this.ownerId = data.ownerId;
     }
 
+    // TODO: handle case when there are more than 1000 rows
     static async all(dbSess: Session): Promise<GridCell[]> {
         const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM GridCells');
 
