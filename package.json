@@ -40,7 +40,7 @@
     "eslint-plugin-mobx": "^0.0.9",
     "eslint-plugin-prefer-arrow-functions": "^3.1.4",
     "eslint-plugin-unicorn": "^43.0.2",
-    "favicons": "^6.2.2",
+    "favicons": "^7.0.0",
     "favicons-webpack-plugin": "^5.0.2",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
