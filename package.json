@@ -87,6 +87,6 @@
     "uuid": "^8.3.2",
     "visibilityjs": "^2.0.2",
     "websocket-ts": "^1.1.1",
-    "ydb-sdk": "^3.4.0"
+    "ydb-sdk": "^3.4.4"
   }
 }

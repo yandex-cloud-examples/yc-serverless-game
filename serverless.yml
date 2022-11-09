@@ -21,7 +21,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/get-state.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -35,7 +34,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/get-config.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -49,7 +47,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/move.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -74,7 +71,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/capture.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -98,7 +94,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/state-change.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -112,7 +107,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/login.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -131,7 +125,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/auth.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -146,7 +139,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-connect.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -160,7 +152,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-message.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -178,7 +169,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-disconnect.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
