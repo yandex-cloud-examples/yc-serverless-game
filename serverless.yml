@@ -192,7 +192,7 @@ resources:
     type: yc::ServiceAccount
     roles:
       - editor
-  serverless-game-files:
+  sls-game-files:
     type: yc::ObjectStorageBucket
   capturing-queue:
     type: yc::MessageQueue
