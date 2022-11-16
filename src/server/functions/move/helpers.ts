@@ -66,7 +66,7 @@ export const validateMoveRequest = async (dbSess: Session, player: User, moveReq
     const gameConfig = await getGameConfig(dbSess);
     const { worldGridSize } = gameConfig;
 
-    if (moveRequest.gridX >= worldGridSize[0] || moveRequest.gridY >= worldGridSize[1]) {
+    if (moveRequest.gridX >= worldGridSize[0] || moveRequest.gridX < 0 || moveRequest.gridY >= worldGridSize[1] || moveRequest.gridY < 0) {
         throw new ValidationError(`Requested to move to out of bounds (${worldGridSize[0]}x${worldGridSize[1]})`);
     }
 
