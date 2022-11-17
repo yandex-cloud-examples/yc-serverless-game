@@ -14,6 +14,10 @@ interface IUserData {
     tgAvatar?: string;
     tgUsername: string;
     color: string;
+    fovTlX?: number;
+    fovTlY?: number;
+    fovBrX?: number;
+    fovBrY?: number;
     gridX: number;
     gridY: number;
     state: UserState;
@@ -47,6 +51,18 @@ export class User extends Entity {
     @declareType(Types.UINT32)
     public gridY: number;
 
+    @declareType(Types.UINT32)
+    public fovTlX?: number;
+
+    @declareType(Types.UINT32)
+    public fovTlY?: number;
+
+    @declareType(Types.UINT32)
+    public fovBrX?: number;
+
+    @declareType(Types.UINT32)
+    public fovBrY?: number;
+
     @declareType(Types.UTF8)
     public state: UserState;
 
@@ -65,6 +81,10 @@ export class User extends Entity {
         this.tgAvatar = data.tgAvatar;
         this.tgUsername = data.tgUsername;
         this.color = data.color;
+        this.fovTlX = data.fovTlX;
+        this.fovTlY = data.fovTlY;
+        this.fovBrX = data.fovBrX;
+        this.fovBrY = data.fovBrY;
         this.gridX = data.gridX;
         this.gridY = data.gridY;
         this.state = data.state;

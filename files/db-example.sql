@@ -23,6 +23,10 @@ CREATE TABLE `Users`
 (
     `id` Utf8,
     `color` Utf8,
+    `fov_br_x` Uint32,
+    `fov_br_y` Uint32,
+    `fov_tl_x` Uint32,
+    `fov_tl_y` Uint32,
     `grid_x` Uint32,
     `grid_y` Uint32,
     `image_type` Uint8,
