@@ -64,7 +64,17 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
             DECLARE $id AS UTF8;
             DECLARE $state AS UTF8;
             
-            UPDATE Users SET state = $state, grid_x = $gridX, grid_y = $gridY, fov_tl_x = $fovTlX, fov_tl_y = $fovTlY, fov_br_x = $fovBrX, fov_br_y = $fovBrY WHERE id == $id;
+            UPDATE 
+                Users 
+            SET 
+                state = $state, 
+                grid_x = $gridX, 
+                grid_y = $gridY, 
+                fov_tl_x = $fovTlX, 
+                fov_tl_y = $fovTlY, 
+                fov_br_x = $fovBrX, 
+                fov_br_y = $fovBrY 
+            WHERE id == $id;
         `;
 
         await executeQuery(dbSess, moveQuery, {
