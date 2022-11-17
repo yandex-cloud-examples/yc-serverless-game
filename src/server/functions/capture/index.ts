@@ -23,6 +23,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
         UPDATE Users SET state = $state WHERE id = $id;
     `;
 
+    logger.info(`Got ${event.messages.length} messages from YMQ`);
+
     for (const message of event.messages) {
         const capturingMessage: CapturingMessage = JSON.parse(message.details.message.body);
         const player = await User.findById(dbSess, capturingMessage.playerId);
@@ -45,13 +47,13 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
                     $id: player.getTypedValue('id'),
                     $state: player.getTypedValue('state'),
                 });
+
+                await notifyStateChange('capture', [capturingMessage.gridX, capturingMessage.gridY]);
             } else {
                 logger.info(`Coords of player ${player.id} was changed, do not capture cell`);
             }
         }
     }
-
-    await notifyStateChange('capture');
 
     return functionResponse({});
 });

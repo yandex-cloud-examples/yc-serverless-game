@@ -89,7 +89,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
         });
 
         await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
-        await notifyStateChange('ws-move');
+        await notifyStateChange('ws-move', [moveRequest.gridX, moveRequest.gridY]);
 
         const stateBuilder = await ServerStateBuilder.create(dbSess);
         const responseMessage: MoveResponseMessage = {

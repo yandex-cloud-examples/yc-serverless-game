@@ -81,7 +81,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         $fovBrY: me.getTypedValue('fovBrY'),
     });
 
-    await notifyStateChange('move');
+    await notifyStateChange('move', [moveRequest?.gridX, moveRequest?.gridY]);
 
     await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
 

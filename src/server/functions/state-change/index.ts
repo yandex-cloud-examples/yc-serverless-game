@@ -17,6 +17,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
         return body ? body.updateSource : '';
     });
 
+    logger.info(`Got ${event.messages.length} messages from YMQ`);
+
     if (usersToNotify.length > 0) {
         const stateBuilder = await ServerStateBuilder.create(dbSess);
 
@@ -33,8 +35,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
                 // Absolutely sure wsConnectionId is not empty since queried from DB only users with connectionId
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 await sendCompressedMessage(user.wsConnectionId!, message);
-            } catch {
-                logger.warn(`Unable to send message to connection: ${user.wsConnectionId}`);
+            } catch (error) {
+                logger.warn(`Unable to send message to connection: ${user.wsConnectionId}: ${error}`);
             }
         });
 

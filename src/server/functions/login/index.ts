@@ -97,8 +97,6 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         });
     }
 
-    await notifyStateChange('login');
-
     const hostHeader = event.headers.Host;
     const autCookie = cookie.serialize(AUTH_COOKIE_NAME, JSON.stringify(authParameters), {
         path: '/',
