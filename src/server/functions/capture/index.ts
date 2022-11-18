@@ -9,6 +9,8 @@ import { executeQuery } from '../../db/execute-query';
 import { notifyStateChange } from '../../utils/notify-state-change';
 
 export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
+    logger.info(`Got ${event.messages.length} messages from YMQ`);
+
     const captureGridCellQuery = `
         DECLARE $id AS UTF8;
         DECLARE $gridX as UINT32;
@@ -22,8 +24,6 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
         
         UPDATE Users SET state = $state WHERE id = $id;
     `;
-
-    logger.info(`Got ${event.messages.length} messages from YMQ`);
 
     for (const message of event.messages) {
         const capturingMessage: CapturingMessage = JSON.parse(message.details.message.body);

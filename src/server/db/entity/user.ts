@@ -2,7 +2,7 @@ import {
     withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues,
 } from 'ydb-sdk';
 import { Entity } from './entity';
-import { UserState } from '../../../common/types';
+import { RectCoords, UserState } from '../../../common/types';
 import { executeQuery } from '../execute-query';
 import { GridCell } from './grid-cell';
 import { SCORE_FOR_CELL } from '../../utils/constants';
@@ -134,6 +134,34 @@ export class User extends Entity {
 
     static async allWithWsConnection(dbSess: Session): Promise<User[]> {
         const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM Users WHERE ws_connection_id IS NOT NULL');
+
+        return this.fromResultSet(resultSets[0]);
+    }
+
+    static async allWithFOVInAreaAndWs(dbSess: Session, area: RectCoords): Promise<User[]> {
+        // Find users which FoV intersects with given area
+        const query = `
+            DECLARE $tlX AS UINT32;
+            DECLARE $tlY AS UINT32;
+            DECLARE $brX AS UINT32;
+            DECLARE $brY AS UINT32;
+            
+            SELECT
+                *
+            FROM
+                Users
+            WHERE
+                ws_connection_id IS NOT NULL AND
+                ($tlX >= fov_tl_x AND $tlX <= fov_br_x OR  $brX >= fov_tl_x AND $brX <= fov_br_x ) AND
+                ($tlY >= fov_tl_y AND $tlY <= fov_br_y OR $brY >= fov_tl_y AND $brY <= fov_br_y)
+        `;
+
+        const { resultSets } = await executeQuery(dbSess, query, {
+            $tlX: TypedValues.uint32(area[0][0]),
+            $tlY: TypedValues.uint32(area[0][1]),
+            $brX: TypedValues.uint32(area[1][0]),
+            $brY: TypedValues.uint32(area[0][1]),
+        });
 
         return this.fromResultSet(resultSets[0]);
     }

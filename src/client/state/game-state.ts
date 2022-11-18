@@ -3,7 +3,7 @@ import {
 } from 'mobx';
 
 import { ServerState, UserState } from '../../common/types';
-import { updateDiff } from '../../common/utils/update-diff';
+import { hasDiff } from '../../common/utils/deep-diff';
 import { createLogger } from '../../common/logger';
 
 const logger = createLogger('GameState');
@@ -32,10 +32,21 @@ export class GameState {
     update(newState: ServerState) {
         logger.debug('Received request to update state', newState);
 
-        updateDiff(this.me, newState.me);
-        updateDiff(this.grid, newState.grid);
-        updateDiff(this.players, newState.players);
-        updateDiff(this.stats, newState.stats);
+        if (hasDiff(this.me, newState.me)) {
+            this.me = newState.me;
+        }
+
+        if (hasDiff(this.players, newState.players)) {
+            this.players = newState.players;
+        }
+
+        if (hasDiff(this.grid, newState.grid)) {
+            this.grid = newState.grid;
+        }
+
+        if (hasDiff(this.stats, newState.stats)) {
+            this.stats = newState.stats;
+        }
     }
 
     @action
