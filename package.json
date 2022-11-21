@@ -29,7 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "@yandex-cloud/function-types": "^2.0.2",
-    "@yandex-cloud/serverless-plugin": "^1.6.0",
+    "@yandex-cloud/serverless-plugin": "^1.7.0",
     "autoprefixer": "^10.4.11",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
@@ -64,6 +64,7 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-kinesis": "^3.81.0",
     "@aws-sdk/client-sqs": "^3.160.0",
     "@yandex-cloud/nodejs-sdk": "^2.2.1",
     "async-mutex": "^0.3.2",

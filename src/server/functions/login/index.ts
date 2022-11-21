@@ -37,8 +37,9 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
 
     const gameConfig = await getGameConfig(dbSess);
     const users = await User.all(dbSess);
-    const isRegistered = users.some((u) => u.tgUserId === authParameters.id);
     const online = users.filter((u) => isPlayerActive(gameConfig, u)).length;
+
+    let user = users.find((u) => u.tgUserId === authParameters.id);
 
     if (online >= gameConfig.maxActivePlayers) {
         return {
@@ -49,13 +50,14 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         };
     }
 
-    if (!isRegistered) {
+    if (!user) {
         const existingColors = users.map((u) => u.color);
         const randomColor = getRandomColor(existingColors);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
         const tgAvatar = authParameters.photo_url && transformAvatarUrl(authParameters.photo_url);
         const imageType = Math.floor(Math.random() * PLAYER_IMAGE_TYPES_NUM + 1);
-        const user = new User({
+
+        user = new User({
             id: uuid.v4(),
             color: randomColor,
             gridX: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
@@ -96,6 +98,8 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $imageType: user.getTypedValue('imageType'),
         });
     }
+
+    await notifyStateChange('login', [user.gridX, user.gridY]);
 
     const hostHeader = event.headers.Host;
     const autCookie = cookie.serialize(AUTH_COOKIE_NAME, JSON.stringify(authParameters), {

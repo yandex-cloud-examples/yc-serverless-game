@@ -1,8 +1,8 @@
 import {
-    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues,
+    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues, Ydb,
 } from 'ydb-sdk';
 import { Entity } from './entity';
-import { RectCoords, UserState } from '../../../common/types';
+import { Coords, UserState } from '../../../common/types';
 import { executeQuery } from '../execute-query';
 import { GridCell } from './grid-cell';
 import { SCORE_FOR_CELL } from '../../utils/constants';
@@ -138,13 +138,31 @@ export class User extends Entity {
         return this.fromResultSet(resultSets[0]);
     }
 
-    static async allWithFOVInAreaAndWs(dbSess: Session, area: RectCoords): Promise<User[]> {
-        // Find users which FoV intersects with given area
+    static async allWithFOVInCoordsAndWs(dbSess: Session, coords: Coords[]): Promise<User[]> {
+        if (coords.length === 0) {
+            return [];
+        }
+
+        const declareParts: string[] = [];
+        const whereParts: string[] = [];
+        const queryParams: Record<string, Ydb.ITypedValue> = {};
+
+        for (const [i, c] of coords.entries()) {
+            declareParts.push(
+                `DECLARE $cX${i} AS UINT32;`,
+                `DECLARE $cY${i} AS UINT32;`,
+            );
+
+            whereParts.push(
+                `($cX${i} BETWEEN fov_tl_x AND fov_br_x AND $cY${i} BETWEEN fov_tl_y AND fov_br_y)`,
+            );
+
+            queryParams[`$cX${i}`] = TypedValues.uint32(c[0]);
+            queryParams[`$cY${i}`] = TypedValues.uint32(c[1]);
+        }
+
         const query = `
-            DECLARE $tlX AS UINT32;
-            DECLARE $tlY AS UINT32;
-            DECLARE $brX AS UINT32;
-            DECLARE $brY AS UINT32;
+            ${declareParts.join('\n')}
             
             SELECT
                 *
@@ -152,16 +170,10 @@ export class User extends Entity {
                 Users
             WHERE
                 ws_connection_id IS NOT NULL AND
-                ($tlX >= fov_tl_x AND $tlX <= fov_br_x OR  $brX >= fov_tl_x AND $brX <= fov_br_x ) AND
-                ($tlY >= fov_tl_y AND $tlY <= fov_br_y OR $brY >= fov_tl_y AND $brY <= fov_br_y)
+                (${whereParts.join(' OR ')})
         `;
 
-        const { resultSets } = await executeQuery(dbSess, query, {
-            $tlX: TypedValues.uint32(area[0][0]),
-            $tlY: TypedValues.uint32(area[0][1]),
-            $brX: TypedValues.uint32(area[1][0]),
-            $brY: TypedValues.uint32(area[0][1]),
-        });
+        const { resultSets } = await executeQuery(dbSess, query, queryParams);
 
         return this.fromResultSet(resultSets[0]);
     }

@@ -1,9 +1,12 @@
+import { PutRecordCommand } from '@aws-sdk/client-kinesis';
+
 import { getEnv } from './get-env';
-import { sqsClient } from './sqs-client';
 import { logger } from '../../common/logger';
 import { Coords, NotifyStateChangeMessage } from '../../common/types';
+import { kinesisClient } from './kinesis-client';
 
-const YMQ_QUEUE_URL = getEnv('YMQ_STATE_CHANGE_URL');
+const YDS_STREAM_NAME = getEnv('YDS_STREAM_NAME');
+const encoder = new TextEncoder();
 
 export const notifyStateChange = async (updateSource: string, gridCoords: Coords) => {
     const message: NotifyStateChangeMessage = {
@@ -12,11 +15,12 @@ export const notifyStateChange = async (updateSource: string, gridCoords: Coords
     };
 
     try {
-        await sqsClient.sendMessage({
-            QueueUrl: YMQ_QUEUE_URL,
-            MessageBody: JSON.stringify(message),
-        });
+        await kinesisClient.send(new PutRecordCommand({
+            StreamName: YDS_STREAM_NAME,
+            PartitionKey: updateSource,
+            Data: encoder.encode(JSON.stringify(message)),
+        }));
     } catch (error) {
-        logger.error(`Failed to put message to queue: ${JSON.stringify(error)}`);
+        logger.error(`Failed to put message to stream: ${JSON.stringify(error)}`);
     }
 };
