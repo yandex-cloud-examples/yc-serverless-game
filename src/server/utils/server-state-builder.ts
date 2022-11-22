@@ -5,6 +5,7 @@ import { GridCell } from '../db/entity/grid-cell';
 import { logger } from '../../common/logger';
 import { getGameConfig } from './get-game-config';
 import { isPlayerActive } from './is-player-active';
+import { SCORE_FOR_CELL } from './constants';
 
 export class ServerStateBuilder {
     private readonly createdTime: number;
@@ -37,7 +38,7 @@ export class ServerStateBuilder {
             gridX: user.gridX,
             gridY: user.gridY,
             imageType: user.imageType,
-            score: user.calculateScore(gridCells),
+            score: SCORE_FOR_CELL * user.cellsCount,
         };
     }
 

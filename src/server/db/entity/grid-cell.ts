@@ -29,6 +29,23 @@ export class GridCell extends Entity {
         this.ownerId = data.ownerId;
     }
 
+    static async findByCoords(dbSess: Session, x: number, y: number): Promise<GridCell | undefined> {
+        const query = `
+            DECLARE $gridX AS Uint32;
+            DECLARE $gridY AS Uint32;
+            
+            SELECT * FROM GridCells WHERE x = $gridX AND y = $gridY LIMIT 1;
+        `;
+
+        const { resultSets } = await executeQuery(dbSess, query, {
+            $gridX: TypedValues.uint32(x),
+            $gridY: TypedValues.uint32(y),
+        });
+        const gridCells = this.fromResultSet(resultSets[0]);
+
+        return gridCells[0];
+    }
+
     static async all(dbSess: Session): Promise<GridCell[]> {
         const LIMIT = 1000;
         const result: GridCell[] = [];

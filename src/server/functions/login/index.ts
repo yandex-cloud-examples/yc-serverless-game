@@ -68,10 +68,12 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             tgUsername: login,
             tgUserId: authParameters.id,
             imageType,
+            cellsCount: 0,
         });
 
         const createUserQuery = `
             DECLARE $id AS UTF8;
+            DECLARE $cellsCount AS UINT32;
             DECLARE $color AS UTF8;
             DECLARE $gridX AS UINT32;
             DECLARE $gridY AS UINT32;
@@ -81,8 +83,8 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             DECLARE $tgUsername AS UTF8;
             DECLARE $tgUserId AS UTF8;
             DECLARE $imageType AS UINT8;
-            INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username, image_type)
-            VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername, $imageType);
+            INSERT INTO Users (id, cells_count, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username, image_type)
+            VALUES ($id, $cellsCount, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername, $imageType);
         `;
 
         await executeQuery(dbSess, createUserQuery, {
@@ -96,6 +98,7 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $tgUsername: user.getTypedValue('tgUsername'),
             $tgUserId: user.getTypedValue('tgUserId'),
             $imageType: user.getTypedValue('imageType'),
+            $cellsCount: user.getTypedValue('cellsCount'),
         });
     }
 
