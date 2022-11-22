@@ -2,7 +2,7 @@ import {
     withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues, Ydb,
 } from 'ydb-sdk';
 import { Entity } from './entity';
-import { Coords, UserState } from '../../../common/types';
+import { Coords, RectCoords, UserState } from '../../../common/types';
 import { executeQuery } from '../execute-query';
 
 interface IUserData {
@@ -93,6 +93,20 @@ export class User extends Entity {
         this.imageType = data.imageType;
         this.wsConnectionId = data.wsConnectionId;
         this.cellsCount = data.cellsCount;
+    }
+
+    getFoVCoords(): RectCoords | undefined {
+        if (typeof this.fovTlX === 'undefined'
+            || typeof this.fovTlY === 'undefined'
+            || typeof this.fovBrX === 'undefined'
+            || typeof this.fovBrY === 'undefined') {
+            return undefined;
+        }
+
+        return [
+            [this.fovTlX, this.fovTlY],
+            [this.fovBrX, this.fovBrY],
+        ];
     }
 
     static async findById(dbSess: Session, id: string): Promise<User | undefined> {

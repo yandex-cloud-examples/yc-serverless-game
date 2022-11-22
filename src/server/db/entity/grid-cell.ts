@@ -3,6 +3,7 @@ import {
 } from 'ydb-sdk';
 import { Entity } from './entity';
 import { executeQuery } from '../execute-query';
+import { RectCoords } from '../../../common/types';
 
 interface IGridCellData {
     x: number;
@@ -46,7 +47,7 @@ export class GridCell extends Entity {
         return gridCells[0];
     }
 
-    static async all(dbSess: Session): Promise<GridCell[]> {
+    static async allWithinArea(dbSess: Session, area: RectCoords): Promise<GridCell[]> {
         const LIMIT = 1000;
         const result: GridCell[] = [];
 
@@ -59,12 +60,31 @@ export class GridCell extends Entity {
                 DECLARE $limit AS Uint32;
                 DECLARE $lastX AS Int64;
                 DECLARE $lastY AS Int64;
+                DECLARE $minX AS Uint32;
+                DECLARE $maxX AS Uint32;
+                DECLARE $minY AS Uint32;
+                DECLARE $maxY AS Uint32;
                 
-                SELECT * FROM GridCells WHERE x > $lastX OR (x == $lastX AND y > $lastY) ORDER BY x, y LIMIT $limit;
+                SELECT 
+                    * 
+                FROM 
+                    GridCells 
+                WHERE 
+                    (x > $lastX OR (x == $lastX AND y > $lastY)) AND
+                    x BETWEEN $minX AND $maxX AND
+                    y BETWEEN $minY AND $maxY
+                ORDER BY 
+                    x, y 
+                LIMIT 
+                    $limit;
             `, {
                 $limit: TypedValues.uint32(LIMIT),
                 $lastX: TypedValues.int64(lastX),
                 $lastY: TypedValues.int64(lastY),
+                $minX: TypedValues.uint32(area[0][0]),
+                $maxX: TypedValues.uint32(area[1][0]),
+                $minY: TypedValues.uint32(area[0][1]),
+                $maxY: TypedValues.uint32(area[1][1]),
             });
 
             const gridCells = this.fromResultSet(resultSets[0]);

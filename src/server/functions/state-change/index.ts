@@ -19,7 +19,29 @@ export const handler = withDb<Handler.DataStreams>(async (dbSess, event, context
     logger.debug('Affected users: ', usersToNotify.map((u) => u.tgUsername));
 
     if (usersToNotify.length > 0) {
-        const stateBuilder = await ServerStateBuilder.create(dbSess);
+        const fovArea: RectCoords = usersToNotify
+            .reduce(
+                (result, user) => {
+                    return [
+                        [
+                            Math.min(result[0][0], user.fovTlX ?? Number.POSITIVE_INFINITY),
+                            Math.min(result[0][1], user.fovTlY ?? Number.POSITIVE_INFINITY),
+                        ],
+                        [
+                            Math.max(result[1][0], user.fovBrX ?? Number.NEGATIVE_INFINITY),
+                            Math.max(result[1][1], user.fovBrY ?? Number.NEGATIVE_INFINITY),
+                        ],
+                    ];
+                },
+                [
+                    [Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY],
+                    [Number.NEGATIVE_INFINITY, Number.NEGATIVE_INFINITY],
+                ],
+            );
+
+        logger.debug('Building state withing area: ', fovArea);
+
+        const stateBuilder = await ServerStateBuilder.create(dbSess, fovArea);
 
         // Each player should receive personal state
         const allJobs = usersToNotify.map(async (user) => {
