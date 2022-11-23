@@ -21,12 +21,17 @@ export class ServerStateBuilder {
         this.createdTime = Date.now();
     }
 
-    static async create(dbSess: Session, gridArea?: RectCoords) {
+    static async create(dbSess: Session, gridAreas?: RectCoords[]) {
         const gameConfig = await getGameConfig(dbSess);
         const { worldGridSize } = gameConfig;
-        const area = gridArea ?? [[0, 0], [worldGridSize[0] - 1, worldGridSize[1] - 1]];
+        const areas = gridAreas ?? [
+            [
+                [0, 0],
+                [worldGridSize[0] - 1, worldGridSize[1] - 1],
+            ],
+        ];
         const users = await User.all(dbSess);
-        const gridCells = await GridCell.allWithinArea(dbSess, area);
+        const gridCells = await GridCell.allWithinAreas(dbSess, areas);
 
         return new ServerStateBuilder(dbSess, gameConfig, users, gridCells);
     }

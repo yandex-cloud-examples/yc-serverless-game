@@ -91,7 +91,9 @@ export const handler = withDb<Handler.Http>(async (dbSess, event) => {
         await tryCapture(dbSess, me, CAPTURING_DEFAULT_DURATION_S);
         await notifyStateChange('ws-move', [moveRequest.gridX, moveRequest.gridY]);
 
-        const stateBuilder = await ServerStateBuilder.create(dbSess, me.getFoVCoords());
+        const meFoV = me.getFoVCoords();
+        const areas = meFoV && [meFoV];
+        const stateBuilder = await ServerStateBuilder.create(dbSess, areas);
         const responseMessage: MoveResponseMessage = {
             type: 'move-response',
             payload: stateBuilder.buildState(meId),

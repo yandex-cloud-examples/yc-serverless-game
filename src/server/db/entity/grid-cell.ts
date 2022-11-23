@@ -1,5 +1,5 @@
 import {
-    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues,
+    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues, Ydb,
 } from 'ydb-sdk';
 import { Entity } from './entity';
 import { executeQuery } from '../execute-query';
@@ -47,7 +47,7 @@ export class GridCell extends Entity {
         return gridCells[0];
     }
 
-    static async allWithinArea(dbSess: Session, area: RectCoords): Promise<GridCell[]> {
+    static async allWithinAreas(dbSess: Session, areas: RectCoords[]): Promise<GridCell[]> {
         const LIMIT = 1000;
         const result: GridCell[] = [];
 
@@ -55,15 +55,34 @@ export class GridCell extends Entity {
         let lastY = -1;
         let hasMore = true;
 
+        const areasDeclarePars: string[] = [];
+        const areasWhereParts: string[] = [];
+        const areasParams: Record<string, Ydb.ITypedValue> = {};
+
+        for (const [i, area] of areas.entries()) {
+            areasDeclarePars.push(
+                `DECLARE $minX${i} AS Uint32;`,
+                `DECLARE $maxX${i} AS Uint32;`,
+                `DECLARE $minY${i} AS Uint32;`,
+                `DECLARE $maxY${i} AS Uint32;`,
+            );
+
+            areasWhereParts.push(
+                `(x BETWEEN $minX${i} AND $maxX${i} AND y BETWEEN $minY${i} AND $maxY${i})`,
+            );
+
+            areasParams[`$minX${i}`] = TypedValues.uint32(area[0][0]);
+            areasParams[`$maxX${i}`] = TypedValues.uint32(area[1][0]);
+            areasParams[`$minY${i}`] = TypedValues.uint32(area[0][1]);
+            areasParams[`$maxY${i}`] = TypedValues.uint32(area[1][1]);
+        }
+
         while (hasMore) {
             const { resultSets } = await executeQuery(dbSess, `
                 DECLARE $limit AS Uint32;
                 DECLARE $lastX AS Int64;
                 DECLARE $lastY AS Int64;
-                DECLARE $minX AS Uint32;
-                DECLARE $maxX AS Uint32;
-                DECLARE $minY AS Uint32;
-                DECLARE $maxY AS Uint32;
+                ${areasDeclarePars.join('\n')}
                 
                 SELECT 
                     * 
@@ -71,8 +90,7 @@ export class GridCell extends Entity {
                     GridCells 
                 WHERE 
                     (x > $lastX OR (x == $lastX AND y > $lastY)) AND
-                    x BETWEEN $minX AND $maxX AND
-                    y BETWEEN $minY AND $maxY
+                    (${areasWhereParts.join(' OR ')})
                 ORDER BY 
                     x, y 
                 LIMIT 
@@ -81,10 +99,7 @@ export class GridCell extends Entity {
                 $limit: TypedValues.uint32(LIMIT),
                 $lastX: TypedValues.int64(lastX),
                 $lastY: TypedValues.int64(lastY),
-                $minX: TypedValues.uint32(area[0][0]),
-                $maxX: TypedValues.uint32(area[1][0]),
-                $minY: TypedValues.uint32(area[0][1]),
-                $maxY: TypedValues.uint32(area[1][1]),
+                ...areasParams,
             });
 
             const gridCells = this.fromResultSet(resultSets[0]);
