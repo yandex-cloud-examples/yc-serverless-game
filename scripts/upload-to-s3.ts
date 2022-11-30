@@ -15,7 +15,7 @@ const uploadFile = (filePath: string) => {
     const contentType = mimeTypes.lookup(filePath) || 'text/plain';
 
     const command = new PutObjectCommand({
-        Bucket: 'serverless-game-files',
+        Bucket: 'sls-game-files',
         Key: path.relative(FILES_BASE_DIR, filePath),
         Body: fs.createReadStream(filePath),
         ContentType: contentType,

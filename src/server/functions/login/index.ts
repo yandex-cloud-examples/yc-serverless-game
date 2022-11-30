@@ -37,8 +37,9 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
 
     const gameConfig = await getGameConfig(dbSess);
     const users = await User.all(dbSess);
-    const isRegistered = users.some((u) => u.tgUserId === authParameters.id);
     const online = users.filter((u) => isPlayerActive(gameConfig, u)).length;
+
+    let user = users.find((u) => u.tgUserId === authParameters.id);
 
     if (online >= gameConfig.maxActivePlayers) {
         return {
@@ -49,13 +50,14 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
         };
     }
 
-    if (!isRegistered) {
+    if (!user) {
         const existingColors = users.map((u) => u.color);
         const randomColor = getRandomColor(existingColors);
         const login = authParameters.username ? `@${authParameters.username}` : `${authParameters.first_name}${authParameters.last_name}`;
         const tgAvatar = authParameters.photo_url && transformAvatarUrl(authParameters.photo_url);
         const imageType = Math.floor(Math.random() * PLAYER_IMAGE_TYPES_NUM + 1);
-        const user = new User({
+
+        user = new User({
             id: uuid.v4(),
             color: randomColor,
             gridX: Math.floor(Math.random() * gameConfig.worldGridSize[0]),
@@ -66,10 +68,12 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             tgUsername: login,
             tgUserId: authParameters.id,
             imageType,
+            cellsCount: 0,
         });
 
         const createUserQuery = `
             DECLARE $id AS UTF8;
+            DECLARE $cellsCount AS UINT32;
             DECLARE $color AS UTF8;
             DECLARE $gridX AS UINT32;
             DECLARE $gridY AS UINT32;
@@ -79,8 +83,8 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             DECLARE $tgUsername AS UTF8;
             DECLARE $tgUserId AS UTF8;
             DECLARE $imageType AS UINT8;
-            INSERT INTO Users (id, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username, image_type)
-            VALUES ($id, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername, $imageType);
+            INSERT INTO Users (id, cells_count, color, grid_x, grid_y, last_active, state, tg_avatar, tg_user_id, tg_username, image_type)
+            VALUES ($id, $cellsCount, $color, $gridX, $gridY, $lastActive, $state, $tgAvatar, $tgUserId, $tgUsername, $imageType);
         `;
 
         await executeQuery(dbSess, createUserQuery, {
@@ -94,10 +98,11 @@ export const handler = withDb<Handler.Http>(async (dbSess, event, context) => {
             $tgUsername: user.getTypedValue('tgUsername'),
             $tgUserId: user.getTypedValue('tgUserId'),
             $imageType: user.getTypedValue('imageType'),
+            $cellsCount: user.getTypedValue('cellsCount'),
         });
     }
 
-    await notifyStateChange('login');
+    await notifyStateChange('login', [user.gridX, user.gridY]);
 
     const hostHeader = event.headers.Host;
     const autCookie = cookie.serialize(AUTH_COOKIE_NAME, JSON.stringify(authParameters), {

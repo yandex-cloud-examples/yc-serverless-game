@@ -3,7 +3,7 @@ import axios, {
 } from 'axios';
 import axiosRetry from 'axios-retry';
 import { Mutex } from 'async-mutex';
-import { GameConfig, ServerState } from '../../common/types';
+import { GameConfig, RectCoords, ServerState } from '../../common/types';
 import { createLogger } from '../../common/logger';
 import { ApiClient } from './index';
 
@@ -97,7 +97,7 @@ export class HttpClient implements ApiClient {
         return response.data;
     }
 
-    async moveTo(gridX: number, gridY: number) {
+    async moveTo(gridX: number, gridY: number, fov: RectCoords) {
         await this.modificationMutex.runExclusive(() => {
             return this.request({
                 method: 'POST',
@@ -105,6 +105,7 @@ export class HttpClient implements ApiClient {
                 data: {
                     gridX,
                     gridY,
+                    fov,
                 },
             });
         });

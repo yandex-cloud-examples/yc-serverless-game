@@ -1,6 +1,6 @@
 import Logger from 'js-logger';
 
-const level = process.env.DEBUG ? Logger.TRACE : Logger.WARN;
+const level = process.env.DEBUG ? Logger.TRACE : Logger.INFO;
 
 Logger.useDefaults();
 Logger.setLevel(level);

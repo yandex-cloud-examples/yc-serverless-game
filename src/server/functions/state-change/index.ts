@@ -1,24 +1,30 @@
 import { Handler } from '@yandex-cloud/function-types';
+import { compact } from 'lodash';
 import { functionResponse } from '../../utils/function-response';
 import { withDb } from '../../db/with-db';
 import { User } from '../../db/entity/user';
 import { ServerStateBuilder } from '../../utils/server-state-builder';
 import { logger } from '../../../common/logger';
-import { ServerState } from '../../../common/types';
+import { NotifyStateChangeMessage, RectCoords, ServerState } from '../../../common/types';
 import { StateUpdateMessage } from '../../../common/ws/messages';
-import { safeJsonParse } from '../../../common/utils/safe-json-parse';
 import { sendCompressedMessage } from '../../utils/ws';
 
-export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, context) => {
-    const usersToNotify = await User.allWithWsConnection(dbSess);
-    const updateSources = event.messages.map((m) => {
-        const body = safeJsonParse<{ updateSource: string }>(m.details.message.body);
+export const handler = withDb<Handler.DataStreams>(async (dbSess, event, context) => {
+    logger.info(`Got ${event.messages.length} messages from YDS`);
 
-        return body ? body.updateSource : '';
-    });
+    const notifyMessages = event.messages as NotifyStateChangeMessage[];
+    const updateSources = notifyMessages.map((m) => m.updateSource);
+    const affectedCoords = notifyMessages.map((m) => m.gridCoords);
+    const usersToNotify = await User.allWithFOVInCoordsAndWs(dbSess, affectedCoords);
+
+    logger.debug('Affected users: ', usersToNotify.map((u) => u.tgUsername));
 
     if (usersToNotify.length > 0) {
-        const stateBuilder = await ServerStateBuilder.create(dbSess);
+        const fovAreas = compact(usersToNotify.map((u) => u.getFoVCoords()));
+
+        logger.debug('Building state withing areas: ', fovAreas);
+
+        const stateBuilder = await ServerStateBuilder.create(dbSess, fovAreas);
 
         // Each player should receive personal state
         const allJobs = usersToNotify.map(async (user) => {
@@ -33,8 +39,8 @@ export const handler = withDb<Handler.MessageQueue>(async (dbSess, event, contex
                 // Absolutely sure wsConnectionId is not empty since queried from DB only users with connectionId
                 // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
                 await sendCompressedMessage(user.wsConnectionId!, message);
-            } catch {
-                logger.warn(`Unable to send message to connection: ${user.wsConnectionId}`);
+            } catch (error) {
+                logger.warn(`Unable to send message to connection: ${user.wsConnectionId}: ${error}`);
             }
         });
 

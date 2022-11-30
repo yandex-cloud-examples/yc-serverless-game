@@ -5,7 +5,7 @@ import { GameState } from './game-state';
 import { logger } from '../../common/logger';
 import { ApiClient } from '../api';
 
-const DEFAULT_POLL_DELAY_MS = 500;
+const DEFAULT_POLL_DELAY_MS = 700;
 const DEFAULT_ERRORS_COUNT_BEFORE_DELAY = 5;
 const DEFAULT_POLL_DELAY_AFTER_ERRORS_MS = 4000;
 

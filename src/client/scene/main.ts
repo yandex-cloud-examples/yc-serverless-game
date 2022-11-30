@@ -32,7 +32,7 @@ export class MainScene extends BaseScene {
         const playersStateManager = new PlayersStateManager(this.gameState, this);
         const me = playersStateManager.getMe();
         const gridStateManager = new GridStateManager(this.gameState, grid);
-        const gridMoveManager = new GridMoveManager(grid, me, apiClient, this.gameState);
+        const gridMoveManager = new GridMoveManager(grid, me, apiClient, this.gameState, this);
         const headerManager = new HeaderInfoManager(this.gameState, this, '#header');
 
         this.cameras.main.startFollow(me);

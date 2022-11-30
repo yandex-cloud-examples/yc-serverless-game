@@ -1,5 +1,6 @@
 import { bind } from 'bind-decorator';
 import { Mutex } from 'async-mutex';
+import * as phaser from 'phaser';
 
 import { Grid } from '../objects/grid/grid';
 import { Player } from '../objects/player';
@@ -7,6 +8,7 @@ import { GridCell } from '../objects/grid/grid-cell';
 import { GameState } from '../state/game-state';
 import { ApiClient } from '../api';
 import { createLogger } from '../../common/logger';
+import { GridCoords } from '../objects/grid/grid-coords';
 
 const MOVE_MUTEX_RELEASE_TIMEOUT_MS = 2000;
 const logger = createLogger('GridMoveManager');
@@ -20,6 +22,7 @@ export class GridMoveManager {
         private readonly player: Player,
         private readonly apiClient: ApiClient,
         private readonly gameState: GameState,
+        private readonly scene: phaser.Scene,
     ) {
         this.grid.onCellClick(this.onCellClick);
     }
@@ -38,6 +41,7 @@ export class GridMoveManager {
         const playerPos = this.player.getGridPos();
         const playerGridCell = this.grid.getCell(playerPos[0], playerPos[1]);
         const clickedCell = this.grid.getCell(gridPos[0], gridPos[1]);
+        const mainCamera = this.scene.cameras.main;
 
         if (this.selectedCell) {
             this.selectedCell.resetState();
@@ -47,8 +51,14 @@ export class GridMoveManager {
             this.selectedCell = clickedCell;
             this.selectedCell.setSelected();
 
-            // do not wait for promise resolution intentionally
-            await this.apiClient.moveTo(gridPos[0], gridPos[1]);
+            const fov = GridCoords.getFieldOfView(
+                mainCamera.worldView.left,
+                mainCamera.worldView.top,
+                mainCamera.worldView.right,
+                mainCamera.worldView.bottom,
+            );
+
+            await this.apiClient.moveTo(gridPos[0], gridPos[1], fov);
 
             this.selectedCell.resetState();
             this.selectedCell = null;

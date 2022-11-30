@@ -21,7 +21,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/get-state.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -35,7 +34,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/get-config.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -49,7 +47,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/move.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -57,7 +54,9 @@ functions:
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
       YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
       YMQ_CAPTURE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_capture_queue_url}
-      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
+      YDS_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_id}
+      YDS_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_secret}
+      YDS_STREAM_NAME: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_database}/${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_stream}
 
   capture:
     handler: dist/server/capture.handler
@@ -74,14 +73,13 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/capture.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
-      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
-      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
-      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
+      YDS_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_id}
+      YDS_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_secret}
+      YDS_STREAM_NAME: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_database}/${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_stream}
 
   state-change:
     handler: dist/server/state-change.handler
@@ -89,16 +87,16 @@ functions:
     timeout: 5
     account: functions-sa
     events:
-      - ymq:
+      - yds:
+          stream: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_stream}
+          database: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_database}
+          streamAccount: yds-reader-sa
           account: triggers-sa
-          queueAccount: ymq-reader-sa
-          queue: notify-state-change
-          batch: 10
+          batch: 1024
           cutoff: 1
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/state-change.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -112,15 +110,14 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/login.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
       YDB_DB: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_db}
       TG_BOT_TOKEN: ${lockbox:${env:LOCKBOX_SECRET_ID}/tg_bot_token}
-      YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
-      YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
-      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
+      YDS_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_id}
+      YDS_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_secret}
+      YDS_STREAM_NAME: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_database}/${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_stream}
 
 
   auth:
@@ -131,7 +128,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/auth.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -146,7 +142,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-connect.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -160,7 +155,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-message.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -168,7 +162,9 @@ functions:
       YMQ_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_id}
       YMQ_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_writer_key_secret}
       YMQ_CAPTURE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_capture_queue_url}
-      YMQ_STATE_CHANGE_URL: ${lockbox:${env:LOCKBOX_SECRET_ID}/ymq_state_change_queue_url}
+      YDS_WRITER_ACCESS_KEY_ID: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_id}
+      YDS_WRITER_SECRET_ACCESS_KEY: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_writer_key_secret}
+      YDS_STREAM_NAME: ${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_database}/${lockbox:${env:LOCKBOX_SECRET_ID}/yds_state_change_stream}
 
   ws-disconnect:
     handler: dist/server/ws-disconnect.handler
@@ -178,7 +174,6 @@ functions:
     package:
       patterns:
         - '!**'
-        - dist/server/certs/*
         - dist/server/ws-disconnect.js
     environment:
       YDB_ENDPOINT: ${lockbox:${env:LOCKBOX_SECRET_ID}/ydb_endpoint}
@@ -194,18 +189,24 @@ resources:
     type: yc::ServiceAccount
     roles:
       - serverless.functions.invoker
+  yds-reader-sa:
+    type: yc::ServiceAccount
+    roles:
+      - yds.admin
+  yds-writer-sa:
+    type: yc::ServiceAccount
+    roles:
+      - yds.writer
   ymq-reader-sa:
     type: yc::ServiceAccount
     roles:
-      - editor
+      - ymq.reader
   ymq-writer-sa:
     type: yc::ServiceAccount
     roles:
-      - editor
-  serverless-game-files:
+      - ymq.writer
+  sls-game-files:
     type: yc::ObjectStorageBucket
   capturing-queue:
-    type: yc::MessageQueue
-  notify-state-change:
     type: yc::MessageQueue
 

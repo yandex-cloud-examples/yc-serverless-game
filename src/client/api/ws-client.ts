@@ -5,7 +5,7 @@ import { Mutex } from 'async-mutex';
 import { bind } from 'bind-decorator';
 import { ApiClient } from './index';
 import { HttpClient } from './http-client';
-import { ServerState } from '../../common/types';
+import { RectCoords, ServerState } from '../../common/types';
 import {
     MoveRequestMessage, MoveResponseMessage,
 } from '../../common/ws/messages';
@@ -97,10 +97,10 @@ export class WsClient implements ApiClient {
         }
     }
 
-    async moveTo(gridX: number, gridY: number) {
+    async moveTo(gridX: number, gridY: number, fov: RectCoords) {
         const moveRequest = [gridX, gridY];
 
-        logger.debug('Received moveTo request, waiting for mutex', moveRequest);
+        logger.debug('Received moveTo request, waiting for mutex', moveRequest, fov);
 
         let moveResponse: MoveResponseMessage | undefined;
 
@@ -112,6 +112,7 @@ export class WsClient implements ApiClient {
                 payload: {
                     gridX,
                     gridY,
+                    fov,
                 },
             };
 

@@ -1,11 +1,9 @@
 import {
-    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues,
+    withTypeOptions, snakeToCamelCaseConversion, declareType, Types, Session, TypedValues, Ydb,
 } from 'ydb-sdk';
 import { Entity } from './entity';
-import { UserState } from '../../../common/types';
+import { Coords, RectCoords, UserState } from '../../../common/types';
 import { executeQuery } from '../execute-query';
-import { GridCell } from './grid-cell';
-import { SCORE_FOR_CELL } from '../../utils/constants';
 
 interface IUserData {
     id: string;
@@ -14,11 +12,16 @@ interface IUserData {
     tgAvatar?: string;
     tgUsername: string;
     color: string;
+    fovTlX?: number;
+    fovTlY?: number;
+    fovBrX?: number;
+    fovBrY?: number;
     gridX: number;
     gridY: number;
     state: UserState;
     imageType: number;
     wsConnectionId?: string;
+    cellsCount: number;
 }
 
 @withTypeOptions({ namesConversion: snakeToCamelCaseConversion })
@@ -47,6 +50,18 @@ export class User extends Entity {
     @declareType(Types.UINT32)
     public gridY: number;
 
+    @declareType(Types.UINT32)
+    public fovTlX?: number;
+
+    @declareType(Types.UINT32)
+    public fovTlY?: number;
+
+    @declareType(Types.UINT32)
+    public fovBrX?: number;
+
+    @declareType(Types.UINT32)
+    public fovBrY?: number;
+
     @declareType(Types.UTF8)
     public state: UserState;
 
@@ -55,6 +70,9 @@ export class User extends Entity {
 
     @declareType(Types.UTF8)
     public wsConnectionId?: string;
+
+    @declareType(Types.UINT32)
+    public cellsCount: number;
 
     constructor(data: IUserData) {
         super(data);
@@ -65,16 +83,30 @@ export class User extends Entity {
         this.tgAvatar = data.tgAvatar;
         this.tgUsername = data.tgUsername;
         this.color = data.color;
+        this.fovTlX = data.fovTlX;
+        this.fovTlY = data.fovTlY;
+        this.fovBrX = data.fovBrX;
+        this.fovBrY = data.fovBrY;
         this.gridX = data.gridX;
         this.gridY = data.gridY;
         this.state = data.state;
         this.imageType = data.imageType;
         this.wsConnectionId = data.wsConnectionId;
+        this.cellsCount = data.cellsCount;
     }
 
-    // TODO: extract owned cells number from DB
-    calculateScore(gridCells: GridCell[]): number {
-        return gridCells.filter((c) => c.ownerId === this.id).length * SCORE_FOR_CELL;
+    getFoVCoords(): RectCoords | undefined {
+        if (typeof this.fovTlX === 'undefined'
+            || typeof this.fovTlY === 'undefined'
+            || typeof this.fovBrX === 'undefined'
+            || typeof this.fovBrY === 'undefined') {
+            return undefined;
+        }
+
+        return [
+            [this.fovTlX, this.fovTlY],
+            [this.fovBrX, this.fovBrY],
+        ];
     }
 
     static async findById(dbSess: Session, id: string): Promise<User | undefined> {
@@ -114,6 +146,46 @@ export class User extends Entity {
 
     static async allWithWsConnection(dbSess: Session): Promise<User[]> {
         const { resultSets } = await executeQuery(dbSess, 'SELECT * FROM Users WHERE ws_connection_id IS NOT NULL');
+
+        return this.fromResultSet(resultSets[0]);
+    }
+
+    static async allWithFOVInCoordsAndWs(dbSess: Session, coords: Coords[]): Promise<User[]> {
+        if (coords.length === 0) {
+            return [];
+        }
+
+        const declareParts: string[] = [];
+        const whereParts: string[] = [];
+        const queryParams: Record<string, Ydb.ITypedValue> = {};
+
+        for (const [i, c] of coords.entries()) {
+            declareParts.push(
+                `DECLARE $cX${i} AS UINT32;`,
+                `DECLARE $cY${i} AS UINT32;`,
+            );
+
+            whereParts.push(
+                `($cX${i} BETWEEN fov_tl_x AND fov_br_x AND $cY${i} BETWEEN fov_tl_y AND fov_br_y)`,
+            );
+
+            queryParams[`$cX${i}`] = TypedValues.uint32(c[0]);
+            queryParams[`$cY${i}`] = TypedValues.uint32(c[1]);
+        }
+
+        const query = `
+            ${declareParts.join('\n')}
+            
+            SELECT
+                *
+            FROM
+                Users VIEW fov
+            WHERE
+                (${whereParts.join(' OR ')}) AND
+                ws_connection_id IS NOT NULL
+        `;
+
+        const { resultSets } = await executeQuery(dbSess, query, queryParams);
 
         return this.fromResultSet(resultSets[0]);
     }

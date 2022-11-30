@@ -29,7 +29,7 @@
     "@typescript-eslint/eslint-plugin": "^5.33.0",
     "@typescript-eslint/parser": "^5.33.0",
     "@yandex-cloud/function-types": "^2.0.2",
-    "@yandex-cloud/serverless-plugin": "^1.5.2",
+    "@yandex-cloud/serverless-plugin": "^1.7.0",
     "autoprefixer": "^10.4.11",
     "copy-webpack-plugin": "^11.0.0",
     "css-loader": "^6.7.1",
@@ -41,7 +41,7 @@
     "eslint-plugin-prefer-arrow-functions": "^3.1.4",
     "eslint-plugin-unicorn": "^43.0.2",
     "favicons": "^7.0.0",
-    "favicons-webpack-plugin": "^5.0.2",
+    "favicons-webpack-plugin": "^6.0.0-alpha.2",
     "file-loader": "^6.2.0",
     "fork-ts-checker-webpack-plugin": "^7.2.13",
     "html-webpack-plugin": "^5.5.0",
@@ -64,6 +64,7 @@
     "webpack-dev-server": "^4.9.3"
   },
   "dependencies": {
+    "@aws-sdk/client-kinesis": "^3.81.0",
     "@aws-sdk/client-sqs": "^3.160.0",
     "@yandex-cloud/nodejs-sdk": "^2.2.1",
     "async-mutex": "^0.3.2",
@@ -87,6 +88,6 @@
     "uuid": "^8.3.2",
     "visibilityjs": "^2.0.2",
     "websocket-ts": "^1.1.1",
-    "ydb-sdk": "^3.4.0"
+    "ydb-sdk": "^3.4.4"
   }
 }

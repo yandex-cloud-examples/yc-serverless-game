@@ -47,3 +47,12 @@ export interface CapturingMessage {
 }
 
 export type NetworkTransport = 'http' | 'ws';
+
+export type Coords = [number, number];
+// [TopLeft, BottomRight]
+export type RectCoords = [Coords, Coords];
+
+export interface NotifyStateChangeMessage {
+    updateSource: string,
+    gridCoords: Coords,
+}

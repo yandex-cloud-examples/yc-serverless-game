@@ -1,10 +1,13 @@
 import { Session } from 'ydb-sdk';
-import { GameConfig, PlayerState, ServerState } from '../../common/types';
+import {
+    GameConfig, PlayerState, RectCoords, ServerState,
+} from '../../common/types';
 import { User } from '../db/entity/user';
 import { GridCell } from '../db/entity/grid-cell';
 import { logger } from '../../common/logger';
 import { getGameConfig } from './get-game-config';
 import { isPlayerActive } from './is-player-active';
+import { SCORE_FOR_CELL } from './constants';
 
 export class ServerStateBuilder {
     private readonly createdTime: number;
@@ -18,15 +21,22 @@ export class ServerStateBuilder {
         this.createdTime = Date.now();
     }
 
-    static async create(dbSess: Session) {
-        const users = await User.all(dbSess);
-        const gridCells = await GridCell.all(dbSess);
+    static async create(dbSess: Session, gridAreas?: RectCoords[]) {
         const gameConfig = await getGameConfig(dbSess);
+        const { worldGridSize } = gameConfig;
+        const areas = gridAreas ?? [
+            [
+                [0, 0],
+                [worldGridSize[0] - 1, worldGridSize[1] - 1],
+            ],
+        ];
+        const users = await User.all(dbSess);
+        const gridCells = await GridCell.allWithinAreas(dbSess, areas);
 
         return new ServerStateBuilder(dbSess, gameConfig, users, gridCells);
     }
 
-    static userToPlayerState(user: User, gridCells: GridCell[]): PlayerState {
+    static userToPlayerState(user: User): PlayerState {
         return {
             id: user.id,
             name: user.tgUsername,
@@ -37,7 +47,7 @@ export class ServerStateBuilder {
             gridX: user.gridX,
             gridY: user.gridY,
             imageType: user.imageType,
-            score: user.calculateScore(gridCells),
+            score: SCORE_FOR_CELL * user.cellsCount,
         };
     }
 
@@ -48,7 +58,7 @@ export class ServerStateBuilder {
             throw new Error(`Unable to find me in DB: ${meId}`);
         }
 
-        return ServerStateBuilder.userToPlayerState(me, this.gridCells);
+        return ServerStateBuilder.userToPlayerState(me);
     }
 
     buildGrid(): ServerState['grid'] {
@@ -80,7 +90,7 @@ export class ServerStateBuilder {
         });
 
         for (const p of activeEnemies) {
-            playersState.push(ServerStateBuilder.userToPlayerState(p, this.gridCells));
+            playersState.push(ServerStateBuilder.userToPlayerState(p));
         }
 
         return playersState;
@@ -89,7 +99,7 @@ export class ServerStateBuilder {
     buildStats(): ServerState['stats'] {
         return {
             topPlayers: this.users
-                .map((u) => ServerStateBuilder.userToPlayerState(u, this.gridCells))
+                .map((u) => ServerStateBuilder.userToPlayerState(u))
                 .sort((a, b) => b.score - a.score)
                 .slice(0, 15),
         };

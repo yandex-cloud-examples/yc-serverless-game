@@ -1,4 +1,4 @@
-import { ServerState } from '../types';
+import { RectCoords, ServerState } from '../types';
 
 interface GenericMessage<T extends string, P, M = unknown> {
     type: T;
@@ -9,6 +9,7 @@ interface GenericMessage<T extends string, P, M = unknown> {
 interface MoveRequestPayload {
     gridX: number;
     gridY: number;
+    fov: RectCoords
 }
 
 export type MoveRequestMessage = GenericMessage<'move-request', MoveRequestPayload>;
