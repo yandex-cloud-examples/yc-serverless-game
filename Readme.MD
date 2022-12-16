@@ -15,3 +15,7 @@
    7. `APP_ENV` (`production`/`development`) - build mode (code minification, ...)
 2. `npm run build`
 3. `npm run deploy`
+
+
+## Links
+- [Serverless Community chat in telegram](https://t.me/YandexCloudFunctions)
