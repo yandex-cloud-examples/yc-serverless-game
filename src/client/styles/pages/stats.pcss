@@ -7,9 +7,28 @@
 
     height: 100vh;
 
+    #qr {
+        color: #ffffff;
+
+        width: 150px;
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        text-align: center;
+
+        img {
+            width: 120px;
+            height: 120px;
+
+            margin: 5px 15px 50px 15px;
+        }
+    }
+
     #game {
-        width: calc(100vw - 405px);
-        max-width: calc(100vw - 405px);
+        width: calc(100vw - 405px - 150px);
+        max-width: calc(100vw - 405px - 150px);
     }
 
     #stats {
