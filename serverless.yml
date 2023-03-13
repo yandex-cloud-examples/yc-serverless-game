@@ -205,6 +205,14 @@ resources:
     type: yc::ServiceAccount
     roles:
       - ymq.writer
+  apigw-s3-viewer:
+    type: yc::ServiceAccount
+    roles:
+      - storage.viewer
+  apigw-fn-caller:
+    type: yc::ServiceAccount
+    roles:
+      - serverless.functions.invoker
   sls-game-files:
     type: yc::ObjectStorageBucket
   capturing-queue:
