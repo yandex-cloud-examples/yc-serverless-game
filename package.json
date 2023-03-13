@@ -11,7 +11,7 @@
     "build": "run-p build:client build:server",
     "deploy:serverless": "serverless deploy",
     "deploy:static": "ts-node scripts/upload-to-s3.ts",
-    "deploy": "run-p deploy:serverless deploy:static",
+    "deploy": "run-s deploy:serverless deploy:static",
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack serve --config config/webpack/client.ts"
   },
