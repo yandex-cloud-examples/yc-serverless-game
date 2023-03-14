@@ -25,7 +25,7 @@ render(html`
       <script 
               async 
               src="https://telegram.org/js/telegram-widget.js?19" 
-              data-telegram-login="serverless_game_bot" 
+              data-telegram-login="${process.env.TG_BOT_LOGIN}" 
               data-size="large" 
               data-auth-url="/api/login" 
               data-request-access="write"
