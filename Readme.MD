@@ -13,7 +13,8 @@
    5. `YC_FOLDER_ID` - id of folder, where all services will be deployed to
    6. `YC_IAM_TOKEN` - iam token of SA which will be used for creating/updating resources in cloud
    7. `APP_ENV` (`production`/`development`) - build mode (code minification, ...)
-2. `npm run build`
+2. `TG_BOT_LOGIN=<telegram bot login> npm run build`
+   1. `TG_BOT_LOGIN` - login of telegram bot which will be use for authentication via Telegram
 3. `npm run deploy`
 
 

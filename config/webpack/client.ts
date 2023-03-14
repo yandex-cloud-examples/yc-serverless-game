@@ -104,6 +104,7 @@ const config: Configuration = {
             APP_ENV: 'development',
             NODE_ENV: env.isProd ? 'production' : 'development',
             DEBUG: '',
+            TG_BOT_LOGIN: '',
         }),
         new FaviconPlugin({
             cache: false,
