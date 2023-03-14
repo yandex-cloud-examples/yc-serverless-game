@@ -16,6 +16,7 @@ CREATE TABLE `GridCells`
     `x` Uint32,
     `y` Uint32,
     `owner_id` Utf8,
+    INDEX owner_id GLOBAL ON (owner_id),
     PRIMARY KEY (`x`, `y`)
 );
 
@@ -37,6 +38,10 @@ CREATE TABLE `Users`
     `tg_user_id` Utf8,
     `tg_username` Utf8,
     `ws_connection_id` Utf8,
+    INDEX fov GLOBAL ON (fov_tl_x, fov_br_x, fov_tl_y, fov_br_y),
+    INDEX last_active GLOBAL ON (last_active),
+    INDEX tg_user_id GLOBAL ON (tg_user_id),
+    INDEX ws_connection_id GLOBAL ON (ws_connection_id),
     PRIMARY KEY (`id`)
 );
 
