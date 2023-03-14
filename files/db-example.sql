@@ -40,3 +40,5 @@ CREATE TABLE `Users`
     PRIMARY KEY (`id`)
 );
 
+UPSERT INTO `Config` ( `name`, `grid_cell_size`, `max_active_players`, `max_inactive_sec`, `player_size`, `transport`, `world_size_x`, `world_size_y` ) VALUES ('default', 120, 60, 180, 110, 'ws', 45, 45);
+
