@@ -67,7 +67,7 @@
     "@aws-sdk/client-kinesis": "^3.363.0",
     "@aws-sdk/client-sqs": "^3.363.0",
     "@aws-sdk/node-http-handler": "^3.226.0",
-    "@yandex-cloud/nodejs-sdk": "^2.3.2",
+    "@yandex-cloud/nodejs-sdk": "^2.4.6",
     "async-mutex": "^0.3.2",
     "axios": "^0.27.2",
     "axios-retry": "^3.3.1",
