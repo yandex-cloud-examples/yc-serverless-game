@@ -118,24 +118,27 @@ const config: Configuration = {
         port: 443,
         server: 'https',
         allowedHosts: 'all',
-        proxy: {
-            '/api': {
+        proxy: [
+            {
+                context: ['/api'],
                 target: PROXY_TARGET_HOST,
                 secure: false,
                 changeOrigin: true,
             },
-            '/proxy': {
+            {
+                context: ['/proxy'],
                 target: PROXY_TARGET_HOST,
                 secure: false,
                 changeOrigin: true,
             },
-            '/websocket': {
+            {
+                context: ['/websocket'],
                 target: WS_PROXY_TARGET_HOST,
                 secure: false,
                 changeOrigin: true,
                 ws: true,
             },
-        },
+        ],
     },
 };
 
